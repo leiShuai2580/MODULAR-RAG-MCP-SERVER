@@ -1,10 +1,10 @@
 """
-Response Module.
+Response Module. / 响应模块。
 
-This package contains response building components:
-- Response builder
-- Citation generator
-- Multimodal assembler
+This package contains response building components: / 本包包含响应构建组件：
+- Response builder / 响应构建器
+- Citation generator / 引用生成器
+- Multimodal assembler / 多模态组装器
 """
 
 from src.core.response.citation_generator import Citation, CitationGenerator

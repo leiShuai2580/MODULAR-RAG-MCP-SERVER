@@ -1,4 +1,4 @@
-"""Tests for settings loading and validation."""
+"""Tests for settings loading and validation. / settings 加载和校验测试。"""
 
 from __future__ import annotations
 

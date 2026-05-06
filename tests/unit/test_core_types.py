@@ -1,11 +1,11 @@
-"""Unit tests for core data types (Document, Chunk, ChunkRecord).
+"""Unit tests for core data types (Document, Chunk, ChunkRecord). / 核心数据类型（Document、Chunk、ChunkRecord）的单元测试。
 
-Tests cover:
-- Type instantiation
-- Required field validation
-- Serialization (to_dict/from_dict)
-- Metadata conventions
-- Helper methods
+Tests cover: / 测试覆盖：
+- Type instantiation / 类型实例化
+- Required field validation / 必填字段校验
+- Serialization (to_dict/from_dict) / 序列化（to_dict/from_dict）
+- Metadata conventions / Metadata 约定
+- Helper methods / 辅助方法
 """
 
 import pytest
@@ -13,10 +13,10 @@ from src.core.types import Document, Chunk, ChunkRecord
 
 
 class TestDocument:
-    """Test Document data type."""
+    """Test Document data type. / 测试 Document 数据类型。"""
     
     def test_document_creation_valid(self):
-        """Test creating a valid Document."""
+        """Test creating a valid Document. / 测试创建有效 Document。"""
         doc = Document(
             id="doc_123",
             text="# Title\n\nContent here",
@@ -27,7 +27,7 @@ class TestDocument:
         assert doc.metadata["source_path"] == "data/test.pdf"
     
     def test_document_requires_source_path(self):
-        """Test that Document requires source_path in metadata."""
+        """Test that Document requires source_path in metadata. / 测试 Document 要求 metadata 中包含 source_path。"""
         with pytest.raises(ValueError, match="must contain 'source_path'"):
             Document(
                 id="doc_123",
@@ -36,7 +36,7 @@ class TestDocument:
             )
     
     def test_document_optional_metadata_fields(self):
-        """Test Document with extended metadata."""
+        """Test Document with extended metadata. / 测试带扩展 metadata 的 Document。"""
         doc = Document(
             id="doc_123",
             text="Content",
@@ -54,20 +54,20 @@ class TestDocument:
         assert len(doc.metadata["images"]) == 2
     
     def test_document_serialization(self):
-        """Test Document to_dict and from_dict."""
+        """Test Document to_dict and from_dict. / 测试 Document 的 to_dict 和 from_dict。"""
         original = Document(
             id="doc_123",
             text="Content",
             metadata={"source_path": "data/test.pdf", "title": "Test"}
         )
         
-        # Serialize
+        # Serialize / 序列化
         data = original.to_dict()
         assert data["id"] == "doc_123"
         assert data["text"] == "Content"
         assert data["metadata"]["source_path"] == "data/test.pdf"
         
-        # Deserialize
+        # Deserialize / 反序列化
         restored = Document.from_dict(data)
         assert restored.id == original.id
         assert restored.text == original.text
@@ -75,10 +75,10 @@ class TestDocument:
 
 
 class TestChunk:
-    """Test Chunk data type."""
+    """Test Chunk data type. / 测试 Chunk 数据类型。"""
     
     def test_chunk_creation_valid(self):
-        """Test creating a valid Chunk."""
+        """Test creating a valid Chunk. / 测试创建有效 Chunk。"""
         chunk = Chunk(
             id="chunk_123_001",
             text="## Section 1\n\nFirst paragraph",
@@ -89,7 +89,7 @@ class TestChunk:
         assert chunk.metadata["chunk_index"] == 0
     
     def test_chunk_requires_source_path(self):
-        """Test that Chunk requires source_path in metadata."""
+        """Test that Chunk requires source_path in metadata. / 测试 Chunk 要求 metadata 中包含 source_path。"""
         with pytest.raises(ValueError, match="must contain 'source_path'"):
             Chunk(
                 id="chunk_123",
@@ -98,7 +98,7 @@ class TestChunk:
             )
     
     def test_chunk_with_offsets(self):
-        """Test Chunk with start/end offsets."""
+        """Test Chunk with start/end offsets. / 测试带 start/end offsets 的 Chunk。"""
         chunk = Chunk(
             id="chunk_123_001",
             text="Content",
@@ -110,7 +110,7 @@ class TestChunk:
         assert chunk.end_offset == 100
     
     def test_chunk_with_source_ref(self):
-        """Test Chunk with parent document reference."""
+        """Test Chunk with parent document reference. / 测试带父文档引用的 Chunk。"""
         chunk = Chunk(
             id="chunk_123_001",
             text="Content",
@@ -120,7 +120,7 @@ class TestChunk:
         assert chunk.source_ref == "doc_123"
     
     def test_chunk_serialization(self):
-        """Test Chunk to_dict and from_dict."""
+        """Test Chunk to_dict and from_dict. / 测试 Chunk 的 to_dict 和 from_dict。"""
         original = Chunk(
             id="chunk_123_001",
             text="Content",
@@ -130,14 +130,14 @@ class TestChunk:
             source_ref="doc_123"
         )
         
-        # Serialize
+        # Serialize / 序列化
         data = original.to_dict()
         assert data["id"] == "chunk_123_001"
         assert data["start_offset"] == 0
         assert data["end_offset"] == 100
         assert data["source_ref"] == "doc_123"
         
-        # Deserialize
+        # Deserialize / 反序列化
         restored = Chunk.from_dict(data)
         assert restored.id == original.id
         assert restored.text == original.text
@@ -147,10 +147,10 @@ class TestChunk:
 
 
 class TestChunkRecord:
-    """Test ChunkRecord data type."""
+    """Test ChunkRecord data type. / 测试 ChunkRecord 数据类型。"""
     
     def test_chunk_record_creation_valid(self):
-        """Test creating a valid ChunkRecord."""
+        """Test creating a valid ChunkRecord. / 测试创建有效 ChunkRecord。"""
         record = ChunkRecord(
             id="chunk_123_001",
             text="Content",
@@ -163,7 +163,7 @@ class TestChunkRecord:
         assert record.sparse_vector["word1"] == 0.5
     
     def test_chunk_record_requires_source_path(self):
-        """Test that ChunkRecord requires source_path in metadata."""
+        """Test that ChunkRecord requires source_path in metadata. / 测试 ChunkRecord 要求 metadata 中包含 source_path。"""
         with pytest.raises(ValueError, match="must contain 'source_path'"):
             ChunkRecord(
                 id="chunk_123",
@@ -172,7 +172,7 @@ class TestChunkRecord:
             )
     
     def test_chunk_record_without_vectors(self):
-        """Test ChunkRecord can be created without vectors (for intermediate stages)."""
+        """Test ChunkRecord can be created without vectors (for intermediate stages). / 测试 ChunkRecord 可在无向量时创建（用于中间阶段）。"""
         record = ChunkRecord(
             id="chunk_123_001",
             text="Content",
@@ -182,7 +182,7 @@ class TestChunkRecord:
         assert record.sparse_vector is None
     
     def test_chunk_record_serialization(self):
-        """Test ChunkRecord to_dict and from_dict."""
+        """Test ChunkRecord to_dict and from_dict. / 测试 ChunkRecord 的 to_dict 和 from_dict。"""
         original = ChunkRecord(
             id="chunk_123_001",
             text="Content",
@@ -191,20 +191,20 @@ class TestChunkRecord:
             sparse_vector={"word": 0.5}
         )
         
-        # Serialize
+        # Serialize / 序列化
         data = original.to_dict()
         assert data["id"] == "chunk_123_001"
         assert data["dense_vector"] == [0.1, 0.2, 0.3]
         assert data["sparse_vector"] == {"word": 0.5}
         
-        # Deserialize
+        # Deserialize / 反序列化
         restored = ChunkRecord.from_dict(data)
         assert restored.id == original.id
         assert restored.dense_vector == original.dense_vector
         assert restored.sparse_vector == original.sparse_vector
     
     def test_chunk_record_from_chunk(self):
-        """Test creating ChunkRecord from Chunk."""
+        """Test creating ChunkRecord from Chunk. / 测试从 Chunk 创建 ChunkRecord。"""
         chunk = Chunk(
             id="chunk_123_001",
             text="Content",
@@ -225,7 +225,7 @@ class TestChunkRecord:
         assert record.sparse_vector == sparse_vec
     
     def test_chunk_record_metadata_isolation(self):
-        """Test that metadata is copied not shared between Chunk and ChunkRecord."""
+        """Test that metadata is copied not shared between Chunk and ChunkRecord. / 测试 Chunk 和 ChunkRecord 之间 metadata 是复制而非共享。"""
         chunk = Chunk(
             id="chunk_123",
             text="Content",
@@ -235,16 +235,16 @@ class TestChunkRecord:
         record = ChunkRecord.from_chunk(chunk)
         record.metadata["key"] = "modified"
         
-        # Original chunk metadata should be unchanged
+        # Original chunk metadata should be unchanged / 原始 chunk metadata 应保持不变
         assert chunk.metadata["key"] == "original"
         assert record.metadata["key"] == "modified"
 
 
 class TestMultimodalSupport:
-    """Test multimodal image support according to C1 specification."""
+    """Test multimodal image support according to C1 specification. / 根据 C1 规范测试多模态图片支持。"""
     
     def test_document_with_image_placeholder(self):
-        """Test Document with image placeholder in text."""
+        """Test Document with image placeholder in text. / 测试文本中带图片占位符的 Document。"""
         doc = Document(
             id="doc_with_img",
             text="Here is some text.\n\n[IMAGE: abc123_1_0]\n\nMore text after image.",
@@ -270,7 +270,7 @@ class TestMultimodalSupport:
         assert doc.metadata["images"][0]["text_length"] == 21
     
     def test_document_with_multiple_images(self):
-        """Test Document with multiple image placeholders."""
+        """Test Document with multiple image placeholders. / 测试带多个图片占位符的 Document。"""
         doc = Document(
             id="doc_multi_img",
             text="Text [IMAGE: img1] middle [IMAGE: img2] end",
@@ -301,7 +301,7 @@ class TestMultimodalSupport:
         assert doc.text.count("[IMAGE:") == 2
     
     def test_chunk_with_image_reference(self):
-        """Test Chunk containing image placeholder and relevant image metadata."""
+        """Test Chunk containing image placeholder and relevant image metadata. / 测试包含图片占位符和相关图片 metadata 的 Chunk。"""
         chunk = Chunk(
             id="chunk_with_img",
             text="Section content [IMAGE: abc123_1_0] continues here",
@@ -326,7 +326,7 @@ class TestMultimodalSupport:
         assert len(chunk.metadata["images"]) == 1
     
     def test_chunk_record_with_image_captions(self):
-        """Test ChunkRecord with image captions from ImageCaptioner."""
+        """Test ChunkRecord with image captions from ImageCaptioner. / 测试包含 ImageCaptioner 图片描述的 ChunkRecord。"""
         record = ChunkRecord(
             id="record_with_caption",
             text="Architecture diagram [IMAGE: diagram_001] shows the system",
@@ -355,7 +355,7 @@ class TestMultimodalSupport:
         assert "architecture" in record.metadata["image_captions"]["diagram_001"].lower()
     
     def test_image_metadata_structure_validation(self):
-        """Test that image metadata follows the C1 specification structure."""
+        """Test that image metadata follows the C1 specification structure. / 测试 image metadata 遵循 C1 规范结构。"""
         image_ref = {
             "id": "doc_hash_page_seq",
             "path": "data/images/collection/doc_hash_page_seq.png",
@@ -365,13 +365,13 @@ class TestMultimodalSupport:
             "position": {"x": 0, "y": 0, "width": 500, "height": 400}
         }
         
-        # Verify all required fields are present
+        # Verify all required fields are present / 验证所有必需字段都存在
         assert "id" in image_ref
         assert "path" in image_ref
         assert "text_offset" in image_ref
         assert "text_length" in image_ref
         
-        # Verify field types
+        # Verify field types / 验证字段类型
         assert isinstance(image_ref["id"], str)
         assert isinstance(image_ref["path"], str)
         assert isinstance(image_ref["text_offset"], int)
@@ -379,8 +379,8 @@ class TestMultimodalSupport:
         assert isinstance(image_ref["position"], dict)
     
     def test_document_without_images(self):
-        """Test Document without images (images field can be omitted or empty list)."""
-        # Omit images field
+        """Test Document without images (images field can be omitted or empty list). / 测试无图片的 Document（images 字段可省略或为空列表）。"""
+        # Omit images field / 省略 images 字段
         doc1 = Document(
             id="doc_no_img_1",
             text="Plain text document",
@@ -388,7 +388,7 @@ class TestMultimodalSupport:
         )
         assert "images" not in doc1.metadata or doc1.metadata.get("images", []) == []
         
-        # Explicit empty list
+        # Explicit empty list / 显式空列表
         doc2 = Document(
             id="doc_no_img_2",
             text="Plain text document",
@@ -398,25 +398,25 @@ class TestMultimodalSupport:
 
 
 class TestMetadataConventions:
-    """Test metadata field conventions across types."""
+    """Test metadata field conventions across types. / 测试跨类型的 metadata 字段约定。"""
     
     def test_source_path_required_everywhere(self):
-        """Test that source_path is required in all types."""
-        # Document
+        """Test that source_path is required in all types. / 测试所有类型都要求 source_path。"""
+        # Document / Document
         with pytest.raises(ValueError):
             Document(id="d1", text="t", metadata={})
         
-        # Chunk
+        # Chunk / Chunk
         with pytest.raises(ValueError):
             Chunk(id="c1", text="t", metadata={})
         
-        # ChunkRecord
+        # ChunkRecord / ChunkRecord
         with pytest.raises(ValueError):
             ChunkRecord(id="r1", text="t", metadata={})
     
     def test_metadata_extensibility(self):
-        """Test that metadata can be extended without breaking compatibility."""
-        # Add arbitrary fields
+        """Test that metadata can be extended without breaking compatibility. / 测试 metadata 可扩展且不会破坏兼容性。"""
+        # Add arbitrary fields / 添加任意字段
         doc = Document(
             id="doc_123",
             text="Content",
@@ -428,7 +428,7 @@ class TestMetadataConventions:
             }
         )
         
-        # Should serialize and deserialize without issues
+        # Should serialize and deserialize without issues / 应能无问题地序列化和反序列化
         data = doc.to_dict()
         restored = Document.from_dict(data)
         
@@ -437,8 +437,8 @@ class TestMetadataConventions:
         assert restored.metadata["custom_field_3"] == ["list", "values"]
     
     def test_metadata_propagation_pattern(self):
-        """Test typical metadata propagation from Document -> Chunk -> ChunkRecord."""
-        # Document level
+        """Test typical metadata propagation from Document -> Chunk -> ChunkRecord. / 测试典型 metadata 从 Document -> Chunk -> ChunkRecord 的传播。"""
+        # Document level / Document 层级
         doc_metadata = {
             "source_path": "data/report.pdf",
             "doc_type": "pdf",
@@ -448,7 +448,7 @@ class TestMetadataConventions:
         
         doc = Document(id="doc_123", text="Full document text", metadata=doc_metadata.copy())
         
-        # Chunk inherits and extends
+        # Chunk inherits and extends / Chunk 继承并扩展
         chunk_metadata = doc.metadata.copy()
         chunk_metadata.update({
             "chunk_index": 0,
@@ -462,7 +462,7 @@ class TestMetadataConventions:
             source_ref="doc_123"
         )
         
-        # ChunkRecord inherits from chunk and adds enrichment
+        # ChunkRecord inherits from chunk and adds enrichment / ChunkRecord 从 chunk 继承并添加增强信息
         record_metadata = chunk.metadata.copy()
         record_metadata.update({
             "summary": "Introduction section",
@@ -476,7 +476,7 @@ class TestMetadataConventions:
             dense_vector=[0.1, 0.2, 0.3]
         )
         
-        # Verify propagation
+        # Verify propagation / 验证传播
         assert record.metadata["source_path"] == doc.metadata["source_path"]
         assert record.metadata["title"] == doc.metadata["title"]
         assert record.metadata["chunk_index"] == 0

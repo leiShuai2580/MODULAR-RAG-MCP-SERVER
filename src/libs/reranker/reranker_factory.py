@@ -1,8 +1,8 @@
-"""Factory for creating Reranker provider instances.
+"""Factory for creating Reranker provider instances. / 用于创建 Reranker provider 实例的工厂。
 
-This module implements the Factory Pattern to instantiate the appropriate
-Reranker provider based on configuration, enabling configuration-driven selection
-of different backends without code changes.
+This module implements the Factory Pattern to instantiate the appropriate / 此模块实现工厂模式，用于实例化合适的
+Reranker provider based on configuration, enabling configuration-driven selection / Reranker provider，基于配置实现不同后端的选择，
+of different backends without code changes. / 无需修改代码。
 """
 
 from __future__ import annotations
@@ -16,43 +16,43 @@ if TYPE_CHECKING:
 
 
 def _lazy_import_llm_reranker():
-    """Lazy import to avoid circular dependencies."""
+    """Lazy import to avoid circular dependencies. / 延迟导入以避免循环依赖。"""
     from src.libs.reranker.llm_reranker import LLMReranker
     return LLMReranker
 
 
 def _lazy_import_cross_encoder_reranker():
-    """Lazy import to avoid circular dependencies."""
+    """Lazy import to avoid circular dependencies. / 延迟导入以避免循环依赖。"""
     from src.libs.reranker.cross_encoder_reranker import CrossEncoderReranker
     return CrossEncoderReranker
 
 
 class RerankerFactory:
-    """Factory for creating Reranker provider instances.
+    """Factory for creating Reranker provider instances. / 用于创建 Reranker provider 实例的工厂。
     
-    This factory reads the rerank configuration from settings and instantiates
-    the corresponding Reranker implementation. Provider implementations will be
-    added in subsequent tasks (B7.7, B7.8).
+    This factory reads the rerank configuration from settings and instantiates / 此工厂从 settings 读取 rerank 配置并实例化
+    the corresponding Reranker implementation. Provider implementations will be / 对应的 Reranker 实现。Provider 实现会在
+    added in subsequent tasks (B7.7, B7.8). / 后续任务（B7.7、B7.8）中添加。
     
-    Design Principles Applied:
-    - Factory Pattern: Centralizes object creation logic.
-    - Config-Driven: Provider selection based on settings.yaml.
-    - Fallback: Disabled or 'none' provider returns NoneReranker.
-    - Fail-Fast: Raises clear errors for unknown providers.
+    Design Principles Applied: / 应用的设计原则：
+    - Factory Pattern: Centralizes object creation logic. / 工厂模式：集中对象创建逻辑。
+    - Config-Driven: Provider selection based on settings.yaml. / 配置驱动：基于 settings.yaml 选择 provider。
+    - Fallback: Disabled or 'none' provider returns NoneReranker. / 回退：禁用或 'none' provider 返回 NoneReranker。
+    - Fail-Fast: Raises clear errors for unknown providers. / 快速失败：对未知 provider 抛出清晰错误。
     """
     
     _PROVIDERS: dict[str, type[BaseReranker]] = {}
     
     @classmethod
     def register_provider(cls, name: str, provider_class: type[BaseReranker]) -> None:
-        """Register a new Reranker provider implementation.
+        """Register a new Reranker provider implementation. / 注册新的 Reranker provider 实现。
         
-        Args:
-            name: The provider identifier (e.g., 'cross_encoder', 'llm').
-            provider_class: The BaseReranker subclass implementing the provider.
+        Args: / 参数：
+            name: The provider identifier (e.g., 'cross_encoder', 'llm'). / provider 标识符（例如 'cross_encoder'、'llm'）。
+            provider_class: The BaseReranker subclass implementing the provider. / 实现 provider 的 BaseReranker 子类。
         
-        Raises:
-            ValueError: If provider_class doesn't inherit from BaseReranker.
+        Raises: / 异常：
+            ValueError: If provider_class doesn't inherit from BaseReranker. / 如果 provider_class 未继承 BaseReranker。
         """
         if not issubclass(provider_class, BaseReranker):
             raise ValueError(
@@ -62,25 +62,25 @@ class RerankerFactory:
     
     @classmethod
     def create(cls, settings: Settings, **override_kwargs: Any) -> BaseReranker:
-        """Create a Reranker instance based on configuration.
+        """Create a Reranker instance based on configuration. / 基于配置创建 Reranker 实例。
         
-        Args:
-            settings: The application settings containing rerank configuration.
-            **override_kwargs: Optional parameters to override config values.
+        Args: / 参数：
+            settings: The application settings containing rerank configuration. / 包含 rerank 配置的应用设置。
+            **override_kwargs: Optional parameters to override config values. / 用于覆盖配置值的可选参数。
         
-        Returns:
-            An instance of the configured Reranker provider.
+        Returns: / 返回：
+            An instance of the configured Reranker provider. / 已配置 Reranker provider 的实例。
         
-        Raises:
-            ValueError: If the configured provider is not supported or missing.
-            RuntimeError: If provider initialization fails.
+        Raises: / 异常：
+            ValueError: If the configured provider is not supported or missing. / 如果配置的 provider 不受支持或缺失。
+            RuntimeError: If provider initialization fails. / 如果 provider 初始化失败。
         """
-        # Lazy register LLM reranker if not already registered
+        # Lazy register LLM reranker if not already registered / 如果尚未注册，则延迟注册 LLM reranker
         if "llm" not in cls._PROVIDERS:
             LLMReranker = _lazy_import_llm_reranker()
             cls.register_provider("llm", LLMReranker)
         
-        # Lazy register Cross-Encoder reranker if not already registered
+        # Lazy register Cross-Encoder reranker if not already registered / 如果尚未注册，则延迟注册 Cross-Encoder reranker
         if "cross_encoder" not in cls._PROVIDERS:
             CrossEncoderReranker = _lazy_import_cross_encoder_reranker()
             cls.register_provider("cross_encoder", CrossEncoderReranker)
@@ -117,9 +117,9 @@ class RerankerFactory:
     
     @classmethod
     def list_providers(cls) -> list[str]:
-        """List all registered provider names.
+        """List all registered provider names. / 列出所有已注册的 provider 名称。
         
-        Returns:
-            Sorted list of available provider identifiers.
+        Returns: / 返回：
+            Sorted list of available provider identifiers. / 可用 provider 标识符的排序列表。
         """
         return sorted(cls._PROVIDERS.keys())

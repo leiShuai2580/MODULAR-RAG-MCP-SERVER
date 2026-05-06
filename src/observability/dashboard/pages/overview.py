@@ -1,8 +1,8 @@
-"""Overview page – system configuration and data statistics.
+"""Overview page – system configuration and data statistics. / Overview 页面 - 系统配置与数据统计。
 
-Displays:
-- Component configuration cards (LLM, Embedding, VectorStore …)
-- Collection statistics (document count, chunk count, image count)
+Displays: / 显示：
+- Component configuration cards (LLM, Embedding, VectorStore …) / 组件配置卡片（LLM、Embedding、VectorStore 等）
+- Collection statistics (document count, chunk count, image count) / 集合统计（文档数、分块数、图片数）
 """
 
 from __future__ import annotations
@@ -16,9 +16,9 @@ from src.observability.dashboard.services.config_service import ConfigService
 
 
 def _safe_collection_stats() -> Dict[str, Any]:
-    """Attempt to load collection statistics from ChromaDB.
+    """Attempt to load collection statistics from ChromaDB. / 尝试从 ChromaDB 加载集合统计。
 
-    Returns empty dict on failure so the page still renders.
+    Returns empty dict on failure so the page still renders. / 失败时返回空字典，确保页面仍可渲染。
     """
     try:
         from src.core.settings import load_settings, resolve_path
@@ -44,10 +44,10 @@ def _safe_collection_stats() -> Dict[str, Any]:
 
 
 def render() -> None:
-    """Render the Overview page."""
+    """Render the Overview page. / 渲染 Overview 页面。"""
     st.header("📊 System Overview")
 
-    # ── Component configuration cards ──────────────────────────────
+    # ── Component configuration cards ────────────────────────────── / ── 组件配置卡片 ───────────────────────────────────
     st.subheader("🔧 Component Configuration")
 
     try:
@@ -66,7 +66,7 @@ def render() -> None:
                 for k, v in card.extra.items():
                     st.text(f"{k}: {v}")
 
-    # ── Collection statistics ──────────────────────────────────────
+    # ── Collection statistics ────────────────────────────────────── / ── 集合统计 ─────────────────────────────────────
     st.subheader("📁 Collection Statistics")
 
     stats = _safe_collection_stats()
@@ -84,7 +84,7 @@ def render() -> None:
             "Go to the Ingestion Manager page to upload and ingest documents."
         )
 
-    # ── Trace file statistics ──────────────────────────────────────
+    # ── Trace file statistics ────────────────────────────────────── / ── Trace 文件统计 ───────────────────────────────
     st.subheader("📈 Trace Statistics")
 
     from src.core.settings import resolve_path

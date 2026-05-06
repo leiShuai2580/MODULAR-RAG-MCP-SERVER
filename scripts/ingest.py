@@ -1,26 +1,26 @@
 #!/usr/bin/env python
-"""Ingestion script for the Modular RAG MCP Server.
+"""Ingestion script for the Modular RAG MCP Server. / Modular RAG MCP Server 的摄入脚本。
 
-This script provides a command-line interface for ingesting documents into
-the knowledge hub. It supports processing single files or entire directories.
+This script provides a command-line interface for ingesting documents into / 该脚本提供用于将文档摄入知识中枢的命令行接口，
+the knowledge hub. It supports processing single files or entire directories. / 支持处理单个文件或整个目录。
 
-Usage:
-    # Process a single PDF file
+Usage: / 用法：
+    # Process a single PDF file / 处理单个 PDF 文件
     python scripts/ingest.py --path documents/report.pdf --collection contracts
     
-    # Process all PDFs in a directory
+    # Process all PDFs in a directory / 处理目录中的所有 PDF
     python scripts/ingest.py --path documents/ --collection technical_docs
     
-    # Force re-processing (ignore previous ingestion)
+    # Force re-processing (ignore previous ingestion) / 强制重新处理（忽略之前的摄入记录）
     python scripts/ingest.py --path documents/report.pdf --collection contracts --force
     
-    # Use custom configuration file
+    # Use custom configuration file / 使用自定义配置文件
     python scripts/ingest.py --path documents/ --collection contracts --config custom_settings.yaml
 
-Exit codes:
-    0 - Success (all files processed)
-    1 - Partial failure (some files failed)
-    2 - Complete failure (all files failed or configuration error)
+Exit codes: / 退出码：
+    0 - Success (all files processed) / 成功（所有文件已处理）
+    1 - Partial failure (some files failed) / 部分失败（部分文件失败）
+    2 - Complete failure (all files failed or configuration error) / 完全失败（所有文件失败或配置错误）
 """
 
 import argparse
@@ -29,18 +29,18 @@ import sys
 from pathlib import Path
 from typing import List, Optional
 
-# Ensure project root is on sys.path
+# Ensure project root is on sys.path / 确保项目根目录位于 sys.path
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _SCRIPT_DIR.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
-# Set UTF-8 encoding for Windows console
+# Set UTF-8 encoding for Windows console / 为 Windows 控制台设置 UTF-8 编码
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
 
-# Ensure project root is in path for imports
+# Ensure project root is in path for imports / 确保导入时项目根目录在路径中
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -53,10 +53,10 @@ logger = get_logger(__name__)
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command line arguments.
+    """Parse command line arguments. / 解析命令行参数。
     
-    Returns:
-        Parsed arguments namespace
+    Returns: / 返回：
+        Parsed arguments namespace / 解析后的参数命名空间
     """
     parser = argparse.ArgumentParser(
         description="Ingest documents into the Modular RAG knowledge hub.",
@@ -105,14 +105,14 @@ def parse_args() -> argparse.Namespace:
 
 
 def discover_files(path: str, extensions: List[str] = None) -> List[Path]:
-    """Discover files to process from path.
+    """Discover files to process from path. / 从路径发现要处理的文件。
     
-    Args:
-        path: File or directory path
-        extensions: List of file extensions to include (default: ['.pdf'])
+    Args: / 参数：
+        path: File or directory path / 文件或目录路径
+        extensions: List of file extensions to include (default: ['.pdf']) / 要包含的文件扩展名列表（默认 ['.pdf']）
     
-    Returns:
-        List of file paths to process
+    Returns: / 返回：
+        List of file paths to process / 要处理的文件路径列表
     """
     if extensions is None:
         extensions = ['.pdf']
@@ -128,24 +128,24 @@ def discover_files(path: str, extensions: List[str] = None) -> List[Path]:
         else:
             raise ValueError(f"Unsupported file type: {path.suffix}. Supported: {extensions}")
     
-    # Directory: recursively find all matching files
+    # Directory: recursively find all matching files / 目录：递归查找所有匹配文件
     files = []
     for ext in extensions:
         files.extend(path.rglob(f"*{ext}"))
         files.extend(path.rglob(f"*{ext.upper()}"))
     
-    # Remove duplicates and sort
+    # Remove duplicates and sort / 去重并排序
     files = sorted(set(files))
     
     return files
 
 
 def print_summary(results: List[PipelineResult], verbose: bool = False) -> None:
-    """Print processing summary.
+    """Print processing summary. / 打印处理摘要。
     
-    Args:
-        results: List of pipeline results
-        verbose: Whether to print detailed information
+    Args: / 参数：
+        results: List of pipeline results / 流水线结果列表
+        verbose: Whether to print detailed information / 是否打印详细信息
     """
     total = len(results)
     successful = sum(1 for r in results if r.success)
@@ -181,14 +181,14 @@ def print_summary(results: List[PipelineResult], verbose: bool = False) -> None:
 
 
 def main() -> int:
-    """Main entry point for the ingestion script.
+    """Main entry point for the ingestion script. / 摄入脚本主入口点。
     
-    Returns:
-        Exit code (0=success, 1=partial failure, 2=complete failure)
+    Returns: / 返回：
+        Exit code (0=success, 1=partial failure, 2=complete failure) / 退出码（0=成功，1=部分失败，2=完全失败）
     """
     args = parse_args()
     
-    # Setup logging level
+    # Setup logging level / 设置日志级别
     if args.verbose:
         import logging
         logging.getLogger().setLevel(logging.DEBUG)
@@ -196,7 +196,7 @@ def main() -> int:
     print("[*] Modular RAG Ingestion Script")
     print("=" * 60)
     
-    # Load configuration
+    # Load configuration / 加载配置
     try:
         config_path = Path(args.config)
         if not config_path.exists():
@@ -209,7 +209,7 @@ def main() -> int:
         print(f"[FAIL] Failed to load configuration: {e}")
         return 2
     
-    # Discover files
+    # Discover files / 发现文件
     try:
         files = discover_files(args.path)
         print(f"[INFO] Found {len(files)} file(s) to process")
@@ -227,12 +227,12 @@ def main() -> int:
         print(f"[FAIL] {e}")
         return 2
     
-    # Dry run mode
+    # Dry run mode / 空运行模式
     if args.dry_run:
         print("\n[INFO] Dry run mode - no files were processed")
         return 0
     
-    # Initialize pipeline
+    # Initialize pipeline / 初始化流水线
     print(f"\n[INFO] Initializing pipeline...")
     print(f"   Collection: {args.collection}")
     print(f"   Force: {args.force}")
@@ -248,7 +248,7 @@ def main() -> int:
         logger.exception("Pipeline initialization failed")
         return 2
     
-    # Process files
+    # Process files / 处理文件
     print(f"\n[INFO] Processing files...")
     results: List[PipelineResult] = []
     
@@ -282,17 +282,17 @@ def main() -> int:
             ))
             print(f"   [FAIL] Error: {e}")
     
-    # Print summary
+    # Print summary / 打印摘要
     print_summary(results, args.verbose)
     
-    # Determine exit code
+    # Determine exit code / 确定退出码
     successful = sum(1 for r in results if r.success)
     if successful == len(results):
-        return 0  # All successful
+        return 0  # All successful / 全部成功
     elif successful > 0:
-        return 1  # Partial failure
+        return 1  # Partial failure / 部分失败
     else:
-        return 2  # Complete failure
+        return 2  # Complete failure / 完全失败
 
 
 if __name__ == "__main__":

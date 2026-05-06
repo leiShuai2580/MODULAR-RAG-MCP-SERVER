@@ -1,10 +1,10 @@
-"""Tests for DocumentManager and storage enhancements (G2).
+"""Tests for DocumentManager and storage enhancements (G2). / DocumentManager 和存储增强测试（G2）。
 
-Covers:
-- BM25Indexer.remove_document
-- FileIntegrityChecker.remove_record / list_processed
-- ChromaStore.delete_by_metadata (basic contract via mock)
-- DocumentManager.list_documents / get_document_detail / delete_document / get_collection_stats
+Covers: / 覆盖：
+- BM25Indexer.remove_document / BM25Indexer.remove_document
+- FileIntegrityChecker.remove_record / list_processed / FileIntegrityChecker.remove_record / list_processed
+- ChromaStore.delete_by_metadata (basic contract via mock) / ChromaStore.delete_by_metadata（通过 mock 验证基础契约）
+- DocumentManager.list_documents / get_document_detail / delete_document / get_collection_stats / DocumentManager.list_documents / get_document_detail / delete_document / get_collection_stats
 """
 
 from __future__ import annotations
@@ -30,25 +30,25 @@ from src.libs.loader.file_integrity import SQLiteIntegrityChecker
 
 
 # =====================================================================
-# BM25Indexer.remove_document tests
+# BM25Indexer.remove_document tests / BM25Indexer.remove_document 测试
 # =====================================================================
 
 class TestBM25RemoveDocument:
-    """Tests for BM25Indexer.remove_document."""
+    """Tests for BM25Indexer.remove_document. / BM25Indexer.remove_document 测试。"""
 
     def _build_index(self, tmp_path: Path, postings: dict, collection: str = "default"):
-        """Helper: write a minimal BM25 index file and return an indexer."""
+        """Helper: write a minimal BM25 index file and return an indexer. / 辅助函数：写入最小 BM25 索引文件并返回 indexer。"""
         indexer = BM25Indexer(index_dir=str(tmp_path))
-        # Build a valid index structure
+        # Build a valid index structure / 构建有效的索引结构
         index_data = {}
         all_chunk_ids = set()
         for term, entries in postings.items():
             for e in entries:
                 all_chunk_ids.add(e["chunk_id"])
             df = len(entries)
-            num_docs = len(all_chunk_ids)  # rough estimate; recalculated below
+            num_docs = len(all_chunk_ids)  # rough estimate; recalculated below / 粗略估计，下面会重新计算
             index_data[term] = {
-                "idf": 0.0,  # will recalculate
+                "idf": 0.0,  # will recalculate / 稍后重新计算
                 "df": df,
                 "postings": entries,
             }
@@ -84,11 +84,11 @@ class TestBM25RemoveDocument:
         })
         removed = indexer.remove_document("docA", "default")
         assert removed is True
-        # docA postings gone, docB remains
+        # docA postings gone, docB remains / docA postings 已删除，docB 保留
         assert "hello" in indexer._index
         assert len(indexer._index["hello"]["postings"]) == 1
         assert indexer._index["hello"]["postings"][0]["chunk_id"] == "docB_c0"
-        # "world" had only docA → should be removed entirely
+        # "world" had only docA → should be removed entirely / "world" 只有 docA，应被完全移除
         assert "world" not in indexer._index
         assert indexer._metadata["num_docs"] == 1
 
@@ -116,7 +116,7 @@ class TestBM25RemoveDocument:
             ],
         })
         indexer.remove_document("docA", "default")
-        # Load from disk and verify
+        # Load from disk and verify / 从磁盘加载并验证
         indexer2 = BM25Indexer(index_dir=str(tmp_path))
         loaded = indexer2.load("default")
         assert loaded is True
@@ -129,11 +129,11 @@ class TestBM25RemoveDocument:
 
 
 # =====================================================================
-# FileIntegrityChecker.remove_record / list_processed tests
+# FileIntegrityChecker.remove_record / list_processed tests / FileIntegrityChecker.remove_record / list_processed 测试
 # =====================================================================
 
 class TestFileIntegrityEnhancements:
-    """Tests for remove_record and list_processed."""
+    """Tests for remove_record and list_processed. / remove_record 和 list_processed 测试。"""
 
     @pytest.fixture()
     def checker(self, tmp_path):
@@ -175,7 +175,7 @@ class TestFileIntegrityEnhancements:
 
 
 # =====================================================================
-# DocumentManager tests (using mocks)
+# DocumentManager tests (using mocks) / DocumentManager 测试（使用 mock）
 # =====================================================================
 
 def _make_manager(
@@ -183,33 +183,33 @@ def _make_manager(
     chroma_get_ids: Optional[List[str]] = None,
     image_list: Optional[List[Dict[str, Any]]] = None,
 ) -> DocumentManager:
-    """Build a DocumentManager with mock stores."""
+    """Build a DocumentManager with mock stores. / 使用 mock stores 构建 DocumentManager。"""
     chroma = MagicMock()
     bm25 = MagicMock()
     images = MagicMock()
     integrity = MagicMock()
 
-    # Default integrity list_processed
+    # Default integrity list_processed / 默认 integrity list_processed
     integrity.list_processed.return_value = integrity_records or []
 
-    # Default Chroma collection.get
+    # Default Chroma collection.get / 默认 Chroma collection.get
     chroma.collection = MagicMock()
     chroma.collection.get.return_value = {"ids": chroma_get_ids or []}
 
-    # Default image list
+    # Default image list / 默认图片列表
     images.list_images.return_value = image_list or []
     images.delete_image.return_value = True
 
-    # Default delete_by_metadata
+    # Default delete_by_metadata / 默认 delete_by_metadata
     chroma.delete_by_metadata.return_value = len(chroma_get_ids or [])
 
-    # Default bm25 remove
+    # Default bm25 remove / 默认 bm25 remove
     bm25.remove_document.return_value = True
 
-    # Default integrity remove
+    # Default integrity remove / 默认 integrity remove
     integrity.remove_record.return_value = True
 
-    # compute_sha256 returns a fixed hash
+    # compute_sha256 returns a fixed hash / compute_sha256 返回固定 hash
     integrity.compute_sha256.return_value = "abc123"
 
     mgr = DocumentManager(chroma, bm25, images, integrity)
@@ -278,7 +278,7 @@ class TestDocumentManagerDetail:
 class TestDocumentManagerDelete:
 
     def test_delete_success(self, tmp_path):
-        # Create a real temp file so compute_sha256 can work
+        # Create a real temp file so compute_sha256 can work / 创建真实临时文件以便 compute_sha256 工作
         test_file = tmp_path / "test.pdf"
         test_file.write_bytes(b"hello world")
 
@@ -304,7 +304,7 @@ class TestDocumentManagerDelete:
         result = mgr.delete_document(str(test_file), "default")
         assert result.success is False
         assert any("ChromaDB" in e for e in result.errors)
-        # Other stores still attempted
+        # Other stores still attempted / 其他 store 仍会尝试执行
         mgr.bm25.remove_document.assert_called_once()
         mgr.integrity.remove_record.assert_called_once()
 
@@ -322,7 +322,7 @@ class TestDocumentManagerDelete:
         )
         mgr.integrity.compute_sha256.side_effect = FileNotFoundError("gone")
         result = mgr.delete_document("/gone/missing.pdf", "default")
-        # Should fall back to _hash_from_path
+        # Should fall back to _hash_from_path / 应回退到 _hash_from_path
         assert result.success is True or len(result.errors) == 0 or True
         mgr.chroma.delete_by_metadata.assert_called_once()
 
@@ -360,7 +360,7 @@ class TestDocumentManagerStats:
         )
         stats = mgr.get_collection_stats("default")
         assert stats.document_count == 2
-        # Each doc gets 3 chunks (same mock) = 6 total
+        # Each doc gets 3 chunks (same mock) = 6 total / 每个文档得到 3 个 chunk（同一个 mock）= 共 6 个
         assert stats.chunk_count == 6
-        # Each doc gets 1 image = 2 total
+        # Each doc gets 1 image = 2 total / 每个文档得到 1 张图片 = 共 2 张
         assert stats.image_count == 2

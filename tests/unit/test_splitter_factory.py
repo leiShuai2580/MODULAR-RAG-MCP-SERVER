@@ -1,10 +1,10 @@
-"""Unit tests for Splitter Factory and Base Splitter.
+"""Unit tests for Splitter Factory and Base Splitter. / Splitter Factory 和 Base Splitter 的单元测试。
 
-Test Coverage:
-- Factory pattern: provider registration, creation, and routing
-- Configuration-driven instantiation
-- Error handling for unknown/missing providers
-- Validation logic in BaseSplitter
+Test Coverage: / 测试覆盖：
+- Factory pattern: provider registration, creation, and routing / Factory 模式：provider 注册、创建和路由
+- Configuration-driven instantiation / 配置驱动的实例化
+- Error handling for unknown/missing providers / 未知/缺失 provider 的错误处理
+- Validation logic in BaseSplitter / BaseSplitter 中的校验逻辑
 """
 
 from typing import Any, List, Optional
@@ -17,9 +17,9 @@ from src.libs.splitter.splitter_factory import SplitterFactory
 
 
 class FakeSplitter(BaseSplitter):
-    """Fake splitter provider for testing.
+    """Fake splitter provider for testing. / 用于测试的 fake splitter provider。
     
-    Splits text by whitespace for deterministic behavior.
+    Splits text by whitespace for deterministic behavior. / 按空白字符切分文本以获得确定性行为。
     """
     
     def __init__(self, settings: Any = None, **kwargs: Any) -> None:
@@ -41,7 +41,7 @@ class FakeSplitter(BaseSplitter):
 
 
 class TestBaseSplitter:
-    """Tests for BaseSplitter validation helpers."""
+    """Tests for BaseSplitter validation helpers. / BaseSplitter 校验辅助函数测试。"""
     
     def test_validate_text_success(self):
         splitter = FakeSplitter()
@@ -78,7 +78,7 @@ class TestBaseSplitter:
 
 
 class TestFakeSplitter:
-    """Tests for FakeSplitter behavior."""
+    """Tests for FakeSplitter behavior. / FakeSplitter 行为测试。"""
     
     def test_split_text_basic(self):
         splitter = FakeSplitter()
@@ -100,7 +100,7 @@ class TestFakeSplitter:
 
 
 class TestSplitterFactory:
-    """Tests for SplitterFactory."""
+    """Tests for SplitterFactory. / SplitterFactory 测试。"""
     
     def setup_method(self) -> None:
         SplitterFactory._PROVIDERS.clear()

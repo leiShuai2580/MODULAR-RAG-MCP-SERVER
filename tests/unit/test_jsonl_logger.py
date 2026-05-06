@@ -1,9 +1,9 @@
-"""Tests for structured JSON Lines logger (F2).
+"""Tests for structured JSON Lines logger (F2). / 结构化 JSON Lines logger 测试（F2）。
 
-Covers:
-- JSONFormatter output structure
-- get_trace_logger file handler setup
-- write_trace convenience function
+Covers: / 覆盖：
+- JSONFormatter output structure / JSONFormatter 输出结构
+- get_trace_logger file handler setup / get_trace_logger 文件 handler 设置
+- write_trace convenience function / write_trace 便捷函数
 """
 
 import json
@@ -15,11 +15,11 @@ import pytest
 from src.observability.logger import JSONFormatter, get_trace_logger, write_trace
 
 
-# ── JSONFormatter ────────────────────────────────────────────────────
+# ── JSONFormatter / JSONFormatter ───────────────────────────────────
 
 
 class TestJSONFormatter:
-    """Verify JSONFormatter produces valid JSON with required fields."""
+    """Verify JSONFormatter produces valid JSON with required fields. / 验证 JSONFormatter 生成包含必需字段的有效 JSON。"""
 
     def _make_record(
         self, msg: str = "hello", level: int = logging.INFO, **extra: object
@@ -72,20 +72,20 @@ class TestJSONFormatter:
         record = self._make_record(custom_obj=object())
         line = fmt.format(record)
         obj = json.loads(line)
-        assert "custom_obj" in obj  # converted to str
+        assert "custom_obj" in obj  # converted to str / 已转换为 str
 
     def test_single_line_output(self) -> None:
         fmt = JSONFormatter()
         line = fmt.format(self._make_record("no\nnewlines\nplease"))
-        # json.dumps by default escapes newlines as \\n
+        # json.dumps by default escapes newlines as \\n / json.dumps 默认将换行符转义为 \\n
         assert "\n" not in line
 
 
-# ── get_trace_logger ────────────────────────────────────────────────
+# ── get_trace_logger / get_trace_logger ─────────────────────────────
 
 
 class TestGetTraceLogger:
-    """Verify get_trace_logger sets up JSON Lines file handler."""
+    """Verify get_trace_logger sets up JSON Lines file handler. / 验证 get_trace_logger 会设置 JSON Lines 文件 handler。"""
 
     def test_returns_logger(self, tmp_path: Path) -> None:
         p = tmp_path / "traces.jsonl"
@@ -115,11 +115,11 @@ class TestGetTraceLogger:
         assert len(lgr2.handlers) == 1
 
 
-# ── write_trace ─────────────────────────────────────────────────────
+# ── write_trace / write_trace ───────────────────────────────────────
 
 
 class TestWriteTrace:
-    """Verify write_trace convenience function."""
+    """Verify write_trace convenience function. / 验证 write_trace 便捷函数。"""
 
     def test_creates_file(self, tmp_path: Path) -> None:
         p = tmp_path / "traces.jsonl"
@@ -148,7 +148,7 @@ class TestWriteTrace:
         assert p.exists()
 
     def test_round_trip_with_trace_context(self, tmp_path: Path) -> None:
-        """write_trace + TraceContext.to_dict() round-trip."""
+        """write_trace + TraceContext.to_dict() round-trip. / write_trace + TraceContext.to_dict() 往返测试。"""
         from src.core.trace.trace_context import TraceContext
 
         tc = TraceContext(trace_type="query")

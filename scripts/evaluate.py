@@ -1,25 +1,25 @@
 #!/usr/bin/env python
-"""Evaluation script for Modular RAG MCP Server.
+"""Evaluation script for Modular RAG MCP Server. / Modular RAG MCP Server 的评估脚本。
 
-Runs batch evaluation against a golden test set and outputs a metrics report.
+Runs batch evaluation against a golden test set and outputs a metrics report. / 基于黄金测试集运行批量评估并输出指标报告。
 
-Usage:
-    # Run with default settings (custom evaluator)
+Usage: / 用法：
+    # Run with default settings (custom evaluator) / 使用默认设置运行（custom evaluator）
     python scripts/evaluate.py
 
-    # Specify a custom golden test set
+    # Specify a custom golden test set / 指定自定义黄金测试集
     python scripts/evaluate.py --test-set path/to/golden.json
 
-    # Use a specific collection
+    # Use a specific collection / 使用指定集合
     python scripts/evaluate.py --collection technical_docs
 
-    # JSON output
+    # JSON output / JSON 输出
     python scripts/evaluate.py --json
 
-Exit codes:
-    0 - Success
-    1 - Evaluation failure
-    2 - Configuration error
+Exit codes: / 退出码：
+    0 - Success / 成功
+    1 - Evaluation failure / 评估失败
+    2 - Configuration error / 配置错误
 """
 
 from __future__ import annotations
@@ -29,19 +29,19 @@ import json
 import sys
 from pathlib import Path
 
-# Set UTF-8 encoding for Windows console
+# Set UTF-8 encoding for Windows console / 为 Windows 控制台设置 UTF-8 编码
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8")
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8")
 
-# Add project root to path
+# Add project root to path / 将项目根目录加入路径
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(PROJECT_ROOT))
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command-line arguments."""
+    """Parse command-line arguments. / 解析命令行参数。"""
     parser = argparse.ArgumentParser(
         description="Run RAG evaluation against a golden test set."
     )
@@ -75,7 +75,7 @@ def parse_args() -> argparse.Namespace:
 
 
 def main() -> int:
-    """Main entry point."""
+    """Main entry point. / 主入口点。"""
     args = parse_args()
 
     try:
@@ -88,7 +88,7 @@ def main() -> int:
         print(f"❌ Configuration error: {exc}", file=sys.stderr)
         return 2
 
-    # Create evaluator from config
+    # Create evaluator from config / 根据配置创建评估器
     try:
         evaluator = EvaluatorFactory.create(settings)
         evaluator_name = type(evaluator).__name__
@@ -96,7 +96,7 @@ def main() -> int:
         print(f"❌ Failed to create evaluator: {exc}", file=sys.stderr)
         return 2
 
-    # Create HybridSearch (unless --no-search)
+    # Create HybridSearch (unless --no-search) / 创建 HybridSearch（除非指定 --no-search）
     hybrid_search = None
     if not args.no_search:
         try:
@@ -138,7 +138,7 @@ def main() -> int:
         except Exception as exc:
             print(f"⚠️  Failed to initialize search (running without retrieval): {exc}")
 
-    # Create and run EvalRunner
+    # Create and run EvalRunner / 创建并运行 EvalRunner
     runner = EvalRunner(
         settings=settings,
         hybrid_search=hybrid_search,
@@ -159,7 +159,7 @@ def main() -> int:
         print(f"❌ Evaluation failed: {exc}", file=sys.stderr)
         return 1
 
-    # Output results
+    # Output results / 输出结果
     if args.json:
         print(json.dumps(report.to_dict(), indent=2, ensure_ascii=False))
     else:
@@ -169,7 +169,7 @@ def main() -> int:
 
 
 def _print_report(report) -> None:
-    """Print formatted evaluation report."""
+    """Print formatted evaluation report. / 打印格式化评估报告。"""
     print("=" * 60)
     print("  EVALUATION REPORT")
     print("=" * 60)
@@ -179,7 +179,7 @@ def _print_report(report) -> None:
     print(f"  Time:      {report.total_elapsed_ms:.0f} ms")
     print()
 
-    # Aggregate metrics
+    # Aggregate metrics / 聚合指标
     print("─" * 60)
     print("  AGGREGATE METRICS")
     print("─" * 60)
@@ -191,7 +191,7 @@ def _print_report(report) -> None:
         print("  (no metrics computed)")
     print()
 
-    # Per-query details
+    # Per-query details / 逐查询详情
     print("─" * 60)
     print("  PER-QUERY RESULTS")
     print("─" * 60)

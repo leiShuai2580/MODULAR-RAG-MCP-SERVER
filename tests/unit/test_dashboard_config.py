@@ -1,8 +1,8 @@
-"""Tests for G1 – Dashboard ConfigService and page imports.
+"""Tests for G1 – Dashboard ConfigService and page imports. / G1 Dashboard ConfigService 和页面导入测试。
 
-Covers:
-- ConfigService.get_component_cards() returns expected components
-- app.py and pages/overview.py are importable without error
+Covers: / 覆盖：
+- ConfigService.get_component_cards() returns expected components / ConfigService.get_component_cards() 返回预期组件
+- app.py and pages/overview.py are importable without error / app.py 和 pages/overview.py 可无错误导入
 """
 
 from pathlib import Path
@@ -16,10 +16,10 @@ from src.observability.dashboard.services.config_service import (
 )
 
 
-# ── Fake Settings ────────────────────────────────────────────────────
+# ── Fake Settings / 假 Settings ───────────────────────────────────────
 
 def _fake_settings():
-    """Build a mock Settings object with realistic field values."""
+    """Build a mock Settings object with realistic field values. / 构建包含真实字段值的 mock Settings 对象。"""
     s = MagicMock()
     s.llm.provider = "azure_openai"
     s.llm.model = "gpt-4o"
@@ -56,11 +56,11 @@ def _fake_settings():
     return s
 
 
-# ── Tests ────────────────────────────────────────────────────────────
+# ── Tests / 测试 ──────────────────────────────────────────────────────
 
 
 class TestConfigService:
-    """Verify ConfigService produces component cards."""
+    """Verify ConfigService produces component cards. / 验证 ConfigService 生成组件卡片。"""
 
     @patch("src.observability.dashboard.services.config_service.load_settings")
     def test_get_component_cards_returns_list(self, mock_load) -> None:
@@ -68,7 +68,7 @@ class TestConfigService:
         svc = ConfigService("config/settings.yaml")
         cards = svc.get_component_cards()
         assert isinstance(cards, list)
-        assert len(cards) >= 5  # LLM, Embedding, VectorStore, Retrieval, Reranker
+        assert len(cards) >= 5  # LLM, Embedding, VectorStore, Retrieval, Reranker / LLM、Embedding、VectorStore、Retrieval、Reranker
 
     @patch("src.observability.dashboard.services.config_service.load_settings")
     def test_llm_card(self, mock_load) -> None:
@@ -123,7 +123,7 @@ class TestConfigService:
 
 
 class TestDashboardImports:
-    """Verify main app module is importable."""
+    """Verify main app module is importable. / 验证主 app 模块可导入。"""
 
     def test_config_service_importable(self) -> None:
         from src.observability.dashboard.services.config_service import ConfigService

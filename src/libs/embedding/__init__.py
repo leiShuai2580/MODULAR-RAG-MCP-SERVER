@@ -1,10 +1,10 @@
 """
-Embedding Module.
+Embedding Module. / 嵌入模块。
 
-This package contains embedding service abstractions and implementations:
-- Base embedding class
-- Embedding factory
-- Provider implementations (OpenAI, Azure, Ollama)
+This package contains embedding service abstractions and implementations: / 此包包含嵌入服务抽象和实现：
+- Base embedding class / 基础嵌入类
+- Embedding factory / 嵌入工厂
+- Provider implementations (OpenAI, Azure, Ollama) / Provider 实现（OpenAI、Azure、Ollama）
 """
 
 from src.libs.embedding.azure_embedding import AzureEmbedding

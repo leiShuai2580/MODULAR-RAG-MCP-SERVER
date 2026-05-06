@@ -1,11 +1,11 @@
-"""Generate Chinese QA test PDF documents for QA_TEST_PLAN.
+"""Generate Chinese QA test PDF documents for QA_TEST_PLAN. / 为 QA_TEST_PLAN 生成中文 QA 测试 PDF 文档。
 
-Creates three PDFs used by Section O (文档替换与多场景验证):
-1. chinese_technical_doc.pdf  — 纯中文技术文档 (~8 页)
-2. chinese_table_chart_doc.pdf — 含中文表格和流程图的文档 (~6 页, 含图片)
-3. chinese_long_doc.pdf        — 30+ 页中文长文档
+Creates three PDFs used by Section O (文档替换与多场景验证): / 创建 Section O（文档替换与多场景验证）使用的三个 PDF：
+1. chinese_technical_doc.pdf  — 纯中文技术文档 (~8 页) / chinese_technical_doc.pdf - 纯中文技术文档（约 8 页）
+2. chinese_table_chart_doc.pdf — 含中文表格和流程图的文档 (~6 页, 含图片) / chinese_table_chart_doc.pdf - 含中文表格和流程图的文档（约 6 页，含图片）
+3. chinese_long_doc.pdf        — 30+ 页中文长文档 / chinese_long_doc.pdf - 30+ 页中文长文档
 
-Usage:
+Usage: / 用法：
     python tests/fixtures/generate_qa_test_pdfs.py
 """
 
@@ -35,15 +35,15 @@ from reportlab.platypus import (
     TableStyle,
 )
 
-# ---------------------------------------------------------------------------
-# Font helpers
-# ---------------------------------------------------------------------------
+# --------------------------------------------------------------------------- / ---------------------------------------------------------------------------
+# Font helpers / 字体辅助方法
+# --------------------------------------------------------------------------- / ---------------------------------------------------------------------------
 
 _CHINESE_FONT: str | None = None
 
 
 def _register_chinese_font() -> str:
-    """Register a Chinese TrueType font and return its name."""
+    """Register a Chinese TrueType font and return its name. / 注册中文 TrueType 字体并返回其名称。"""
     global _CHINESE_FONT
     if _CHINESE_FONT is not None:
         return _CHINESE_FONT
@@ -68,9 +68,9 @@ def _register_chinese_font() -> str:
     return _CHINESE_FONT
 
 
-# ---------------------------------------------------------------------------
-# Shared style factory
-# ---------------------------------------------------------------------------
+# --------------------------------------------------------------------------- / ---------------------------------------------------------------------------
+# Shared style factory / 共享样式工厂
+# --------------------------------------------------------------------------- / ---------------------------------------------------------------------------
 
 
 def _make_styles():
@@ -120,15 +120,15 @@ def _table_style(header_color: str = "#2c3e50"):
 
 
 def _create_chart_image(width: int, height: int, title: str, chart_type: str = "bar") -> io.BytesIO:
-    """Create a simple chart-like image for embedding in PDFs."""
+    """Create a simple chart-like image for embedding in PDFs. / 创建简单图表风格图片以嵌入 PDF。"""
     img = PILImage.new("RGB", (width, height), color="white")
     draw = ImageDraw.Draw(img)
 
-    # border
+    # border / 边框
     draw.rectangle([2, 2, width - 3, height - 3], outline="#2c3e50", width=2)
 
     if chart_type == "bar":
-        # simple bar chart
+        # simple bar chart / 简单柱状图
         bar_colors = ["#3498db", "#e74c3c", "#2ecc71", "#f39c12", "#9b59b6"]
         bar_w = width // 8
         base_y = height - 40
@@ -137,7 +137,7 @@ def _create_chart_image(width: int, height: int, title: str, chart_type: str = "
             x0 = 40 + i * (bar_w + 15)
             draw.rectangle([x0, base_y - h, x0 + bar_w, base_y], fill=c)
     elif chart_type == "flow":
-        # simple flow-chart boxes
+        # simple flow-chart boxes / 简单流程图框
         boxes = [
             (50, 30, 180, 70, "#3498db", "文档输入"),
             (50, 100, 180, 140, "#2ecc71", "文本分块"),
@@ -147,7 +147,7 @@ def _create_chart_image(width: int, height: int, title: str, chart_type: str = "
         ]
         for x0, y0, x1, y1, c, _label in boxes:
             draw.rectangle([x0, y0, x1, y1], fill=c, outline="#2c3e50")
-        # arrows (simple lines)
+        # arrows (simple lines) / 箭头（简单线条）
         draw.line([(130, 70), (130, 100)], fill="#2c3e50", width=2)
         draw.line([(130, 140), (130, 170)], fill="#2c3e50", width=2)
         draw.line([(180, 120), (220, 120)], fill="#2c3e50", width=2)
@@ -405,7 +405,7 @@ def generate_chinese_technical_doc(output: Path) -> None:
         "全链路 Trace（记录每个阶段的输入/输出/耗时）和 Streamlit Dashboard 三位一体"
         "实现可视化监控。每次摄取和查询操作都会自动生成 Trace 记录，便于问题排查和性能分析。", s["body"]))
 
-    # Build
+    # Build / 构建
     doc.build(elems)
     print(f"✅ Generated: {output}")
 
@@ -564,7 +564,7 @@ def generate_chinese_table_chart_doc(output: Path) -> None:
     elems.append(cft)
     elems.append(Paragraph("表 4：推荐配置项汇总", s["caption"]))
 
-    # Build
+    # Build / 构建
     doc.build(elems)
     print(f"✅ Generated: {output}")
 
@@ -980,12 +980,12 @@ def generate_chinese_long_doc(output: Path) -> None:
         elems.append(Paragraph(ch_title, s["h1"]))
         for sec_title, sec_body in sections:
             elems.append(Paragraph(sec_title, s["h2"]))
-            # Split by \n for multi-line paragraphs
+            # Split by \n for multi-line paragraphs / 按 \n 拆分多行段落
             for para in sec_body.split("\n"):
                 stripped = para.strip()
                 if stripped:
                     elems.append(Paragraph(stripped, s["body"]))
-        # Add padding content to ensure ~2 pages per chapter
+        # Add padding content to ensure ~2 pages per chapter / 添加填充内容以确保每章约 2 页
         elems.append(Spacer(1, 0.15 * inch))
         elems.append(Paragraph("本章小结", s["h2"]))
         elems.append(Paragraph(
@@ -1015,13 +1015,13 @@ def generate_chinese_long_doc(output: Path) -> None:
             "最佳应用场景。能够根据具体需求选择合适的技术方案，是高级工程师的核心能力。", s["body"]))
         elems.append(PageBreak())
 
-    # Build
+    # Build / 构建
     doc.build(elems)
     print(f"✅ Generated: {output}")
 
 
 # ===================================================================
-# Main
+# Main / 主入口
 # ===================================================================
 
 def main() -> None:

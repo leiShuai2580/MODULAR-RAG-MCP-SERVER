@@ -1,4 +1,4 @@
-"""Unit tests for EvalRunner and golden test set loading."""
+"""Unit tests for EvalRunner and golden test set loading. / EvalRunner 和 golden 测试集加载的单元测试。"""
 
 from __future__ import annotations
 
@@ -20,11 +20,11 @@ from src.observability.evaluation.eval_runner import (
 )
 
 
-# ── Fixtures / Helpers ────────────────────────────────────────────
+# ── Fixtures / Helpers / Fixture / 辅助函数 ─────────────────────────
 
 
 class StubEvaluator(BaseEvaluator):
-    """Evaluator that returns fixed metrics for testing."""
+    """Evaluator that returns fixed metrics for testing. / 返回固定测试指标的 evaluator。"""
 
     def evaluate(
         self,
@@ -43,7 +43,7 @@ def _write_golden_json(path: Path, test_cases: List[Dict]) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False), encoding="utf-8")
 
 
-# ── Tests: load_test_set ──────────────────────────────────────────
+# ── Tests: load_test_set / 测试：load_test_set ─────────────────────
 
 
 class TestLoadTestSet:
@@ -73,7 +73,7 @@ class TestLoadTestSet:
             load_test_set(f)
 
 
-# ── Tests: TestCase ───────────────────────────────────────────────
+# ── Tests: TestCase / 测试：TestCase ───────────────────────────────
 
 
 class TestGoldenTestCase:
@@ -95,7 +95,7 @@ class TestGoldenTestCase:
         assert tc.reference_answer is None
 
 
-# ── Tests: EvalRunner ─────────────────────────────────────────────
+# ── Tests: EvalRunner / 测试：EvalRunner ───────────────────────────
 
 
 class TestEvalRunner:
@@ -181,7 +181,7 @@ class TestEvalRunner:
 
 
 class TestEvalRunnerAggregation:
-    """Test metric aggregation logic."""
+    """Test metric aggregation logic. / 测试指标聚合逻辑。"""
 
     def test_aggregate_averages_correctly(self) -> None:
         results = [
@@ -198,7 +198,7 @@ class TestEvalRunnerAggregation:
         assert EvalRunner._aggregate_metrics([]) == {}
 
     def test_aggregate_partial_metrics(self) -> None:
-        """When some queries have metrics that others don't."""
+        """When some queries have metrics that others don't. / 当某些 query 拥有其他 query 没有的指标时。"""
         results = [
             QueryResult(query="q1", metrics={"hit_rate": 1.0}),
             QueryResult(query="q2", metrics={"faithfulness": 0.9}),
@@ -206,16 +206,16 @@ class TestEvalRunnerAggregation:
 
         avg = EvalRunner._aggregate_metrics(results)
 
-        # Each metric averaged over only the queries that produced it
+        # Each metric averaged over only the queries that produced it / 每个指标只对产生该指标的 query 求平均
         assert avg["hit_rate"] == 1.0
         assert avg["faithfulness"] == 0.9
 
 
-# ── Tests: Golden test set fixture ────────────────────────────────
+# ── Tests: Golden test set fixture / 测试：Golden 测试集 fixture ─────
 
 
 class TestGoldenTestSetFixture:
-    """Validate the actual golden test set file exists and is valid."""
+    """Validate the actual golden test set file exists and is valid. / 校验实际 golden 测试集文件存在且有效。"""
 
     def test_golden_set_loads(self) -> None:
         golden_path = Path("tests/fixtures/golden_test_set.json")

@@ -1,10 +1,10 @@
-"""Modular RAG Dashboard – multi-page Streamlit application.
+"""Modular RAG Dashboard – multi-page Streamlit application. / Modular RAG Dashboard - 多页面 Streamlit 应用。
 
-Entry-point: ``streamlit run src/observability/dashboard/app.py``
+Entry-point: ``streamlit run src/observability/dashboard/app.py`` / 入口点：``streamlit run src/observability/dashboard/app.py``
 
-Pages are registered via ``st.navigation()`` and rendered by their
-respective modules under ``pages/``.  Pages not yet implemented show
-a placeholder message.
+Pages are registered via ``st.navigation()`` and rendered by their / 页面通过 ``st.navigation()`` 注册，并由 ``pages/`` 下
+respective modules under ``pages/``.  Pages not yet implemented show / 各自的模块渲染。尚未实现的页面会显示
+a placeholder message. / 占位消息。
 """
 
 from __future__ import annotations
@@ -12,7 +12,7 @@ from __future__ import annotations
 import streamlit as st
 
 
-# ── Page definitions ─────────────────────────────────────────────────
+# ── Page definitions ───────────────────────────────────────────────── / ── 页面定义 ─────────────────────────────────────
 
 def _page_overview() -> None:
     from src.observability.dashboard.pages.overview import render
@@ -44,7 +44,7 @@ def _page_evaluation_panel() -> None:
     render()
 
 
-# ── Navigation ───────────────────────────────────────────────────────
+# ── Navigation ─────────────────────────────────────────────────────── / ── 导航 ───────────────────────────────────────
 
 pages = [
     st.Page(_page_overview, title="Overview", icon="📊", default=True),
@@ -70,5 +70,5 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 else:
-    # When run directly via `streamlit run app.py`
+    # When run directly via `streamlit run app.py` / 当通过 `streamlit run app.py` 直接运行时
     main()

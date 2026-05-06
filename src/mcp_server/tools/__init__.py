@@ -1,7 +1,7 @@
 """
-MCP Server Tools.
+MCP Server Tools. / MCP 服务器工具。
 
-This package contains the MCP tool definitions exposed to clients.
+This package contains the MCP tool definitions exposed to clients. / 该包包含暴露给客户端的 MCP 工具定义。
 """
 
 from src.mcp_server.tools.query_knowledge_hub import (

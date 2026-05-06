@@ -1,4 +1,4 @@
-"""Tests for LLM-based Reranker implementation."""
+"""Tests for LLM-based Reranker implementation. / 基于 LLM 的 Reranker 实现测试。"""
 
 import json
 from pathlib import Path
@@ -13,7 +13,7 @@ from src.libs.reranker.llm_reranker import LLMRerankError, LLMReranker
 
 
 class MockLLM(BaseLLM):
-    """Mock LLM for testing."""
+    """Mock LLM for testing. / 用于测试的 Mock LLM。"""
     
     def __init__(self, response_content: str = "[]"):
         self.response_content = response_content
@@ -37,13 +37,13 @@ class MockLLM(BaseLLM):
 
 @pytest.fixture
 def mock_settings():
-    """Create mock settings for testing."""
+    """Create mock settings for testing. / 创建用于测试的 mock settings。"""
     return Mock(spec=Settings)
 
 
 @pytest.fixture
 def sample_prompt():
-    """Sample rerank prompt template."""
+    """Sample rerank prompt template. / 示例 rerank prompt 模板。"""
     return """You are an AI assistant specialized in evaluating relevance.
 Given a query and passages, score each passage on relevance (0-3).
 Output JSON format with passage_id and score."""
@@ -51,7 +51,7 @@ Output JSON format with passage_id and score."""
 
 @pytest.fixture
 def sample_candidates():
-    """Sample candidate list for reranking."""
+    """Sample candidate list for reranking. / 用于 reranking 的示例候选列表。"""
     return [
         {"id": "chunk_1", "text": "Python is a programming language.", "score": 0.8},
         {"id": "chunk_2", "text": "Machine learning uses neural networks.", "score": 0.75},
@@ -60,11 +60,11 @@ def sample_candidates():
 
 
 class TestLLMRerankerInit:
-    """Test LLMReranker initialization."""
+    """Test LLMReranker initialization. / 测试 LLMReranker 初始化。"""
     
     def test_init_with_defaults(self, mock_settings, sample_prompt, tmp_path):
-        """Test initialization with default parameters."""
-        # Create temp prompt file
+        """Test initialization with default parameters. / 测试使用默认参数初始化。"""
+        # Create temp prompt file / 创建临时 prompt 文件
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -80,7 +80,7 @@ class TestLLMRerankerInit:
         assert reranker.prompt_template == sample_prompt
     
     def test_init_missing_prompt_file(self, mock_settings):
-        """Test initialization fails with missing prompt file."""
+        """Test initialization fails with missing prompt file. / 测试缺失 prompt 文件时初始化失败。"""
         mock_llm = MockLLM()
         
         with pytest.raises(LLMRerankError, match="Failed to load rerank prompt"):
@@ -91,7 +91,7 @@ class TestLLMRerankerInit:
             )
     
     def test_load_prompt_template(self, mock_settings, sample_prompt, tmp_path):
-        """Test prompt template loading."""
+        """Test prompt template loading. / 测试 prompt 模板加载。"""
         prompt_file = tmp_path / "custom_prompt.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -106,10 +106,10 @@ class TestLLMRerankerInit:
 
 
 class TestLLMRerankerPromptBuilding:
-    """Test prompt building functionality."""
+    """Test prompt building functionality. / 测试 prompt 构建功能。"""
     
     def test_build_rerank_prompt(self, mock_settings, sample_prompt, sample_candidates, tmp_path):
-        """Test prompt construction with query and candidates."""
+        """Test prompt construction with query and candidates. / 测试使用 query 和 candidates 构建 prompt。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -123,7 +123,7 @@ class TestLLMRerankerPromptBuilding:
         query = "What is RAG?"
         prompt = reranker._build_rerank_prompt(query, sample_candidates)
         
-        # Check that prompt contains expected elements
+        # Check that prompt contains expected elements / 检查 prompt 包含预期元素
         assert sample_prompt in prompt
         assert query in prompt
         assert "chunk_1" in prompt
@@ -132,7 +132,7 @@ class TestLLMRerankerPromptBuilding:
         assert "Python is a programming language" in prompt
     
     def test_build_prompt_with_missing_text(self, mock_settings, sample_prompt, tmp_path):
-        """Test prompt building with candidates missing text field."""
+        """Test prompt building with candidates missing text field. / 测试 candidates 缺失 text 字段时的 prompt 构建。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -145,7 +145,7 @@ class TestLLMRerankerPromptBuilding:
         
         candidates = [
             {"id": "chunk_1", "content": "Alternative field name"},
-            {"id": "chunk_2"},  # Missing both text and content
+            {"id": "chunk_2"},  # Missing both text and content / 同时缺失 text 和 content
         ]
         
         query = "test query"
@@ -157,10 +157,10 @@ class TestLLMRerankerPromptBuilding:
 
 
 class TestLLMRerankerResponseParsing:
-    """Test LLM response parsing and validation."""
+    """Test LLM response parsing and validation. / 测试 LLM 响应解析和校验。"""
     
     def test_parse_valid_json_response(self, mock_settings, sample_prompt, tmp_path):
-        """Test parsing valid JSON response."""
+        """Test parsing valid JSON response. / 测试解析有效 JSON 响应。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -185,7 +185,7 @@ class TestLLMRerankerResponseParsing:
         assert parsed[1]["score"] == 1
     
     def test_parse_json_with_markdown_wrapper(self, mock_settings, sample_prompt, tmp_path):
-        """Test parsing JSON wrapped in markdown code blocks."""
+        """Test parsing JSON wrapped in markdown code blocks. / 测试解析包裹在 markdown 代码块中的 JSON。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -209,7 +209,7 @@ class TestLLMRerankerResponseParsing:
         assert parsed[0]["score"] == 3
     
     def test_parse_invalid_json(self, mock_settings, sample_prompt, tmp_path):
-        """Test error handling for invalid JSON."""
+        """Test error handling for invalid JSON. / 测试无效 JSON 的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -224,7 +224,7 @@ class TestLLMRerankerResponseParsing:
             reranker._parse_llm_response("This is not JSON")
     
     def test_parse_non_array_response(self, mock_settings, sample_prompt, tmp_path):
-        """Test error handling for non-array response."""
+        """Test error handling for non-array response. / 测试非数组响应的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -239,7 +239,7 @@ class TestLLMRerankerResponseParsing:
             reranker._parse_llm_response('{"key": "value"}')
     
     def test_parse_missing_passage_id(self, mock_settings, sample_prompt, tmp_path):
-        """Test error handling for missing passage_id field."""
+        """Test error handling for missing passage_id field. / 测试缺失 passage_id 字段的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -256,7 +256,7 @@ class TestLLMRerankerResponseParsing:
             reranker._parse_llm_response(response)
     
     def test_parse_missing_score(self, mock_settings, sample_prompt, tmp_path):
-        """Test error handling for missing score field."""
+        """Test error handling for missing score field. / 测试缺失 score 字段的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -273,7 +273,7 @@ class TestLLMRerankerResponseParsing:
             reranker._parse_llm_response(response)
     
     def test_parse_non_numeric_score(self, mock_settings, sample_prompt, tmp_path):
-        """Test error handling for non-numeric score."""
+        """Test error handling for non-numeric score. / 测试非数字 score 的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -291,14 +291,14 @@ class TestLLMRerankerResponseParsing:
 
 
 class TestLLMRerankerReranking:
-    """Test end-to-end reranking functionality."""
+    """Test end-to-end reranking functionality. / 测试端到端 reranking 功能。"""
     
     def test_rerank_success(self, mock_settings, sample_prompt, sample_candidates, tmp_path):
-        """Test successful reranking with valid LLM response."""
+        """Test successful reranking with valid LLM response. / 测试使用有效 LLM 响应成功 reranking。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
-        # Mock LLM returns reranked scores
+        # Mock LLM returns reranked scores / Mock LLM 返回 reranked scores
         llm_response = json.dumps([
             {"passage_id": "chunk_3", "score": 3, "reasoning": "Most relevant"},
             {"passage_id": "chunk_1", "score": 2, "reasoning": "Partially relevant"},
@@ -315,7 +315,7 @@ class TestLLMRerankerReranking:
         query = "What is RAG?"
         reranked = reranker.rerank(query, sample_candidates)
         
-        # Check order (should be chunk_3, chunk_1, chunk_2 by score)
+        # Check order (should be chunk_3, chunk_1, chunk_2 by score) / 检查顺序（按分数应为 chunk_3、chunk_1、chunk_2）
         assert len(reranked) == 3
         assert reranked[0]["id"] == "chunk_3"
         assert reranked[0]["rerank_score"] == 3
@@ -324,11 +324,11 @@ class TestLLMRerankerReranking:
         assert reranked[2]["id"] == "chunk_2"
         assert reranked[2]["rerank_score"] == 1
         
-        # Check LLM was called
+        # Check LLM was called / 检查 LLM 已被调用
         assert mock_llm.call_count == 1
     
     def test_rerank_single_candidate(self, mock_settings, sample_prompt, tmp_path):
-        """Test reranking with single candidate (no-op)."""
+        """Test reranking with single candidate (no-op). / 测试单个 candidate 的 reranking（无操作）。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -344,13 +344,13 @@ class TestLLMRerankerReranking:
         
         reranked = reranker.rerank(query, candidates)
         
-        # Should return as-is without calling LLM
+        # Should return as-is without calling LLM / 应原样返回且不调用 LLM
         assert len(reranked) == 1
         assert reranked[0]["id"] == "chunk_1"
         assert mock_llm.call_count == 0
     
     def test_rerank_invalid_query(self, mock_settings, sample_prompt, sample_candidates, tmp_path):
-        """Test error handling for invalid query."""
+        """Test error handling for invalid query. / 测试无效 query 的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -365,7 +365,7 @@ class TestLLMRerankerReranking:
             reranker.rerank("   ", sample_candidates)
     
     def test_rerank_invalid_candidates(self, mock_settings, sample_prompt, tmp_path):
-        """Test error handling for invalid candidates."""
+        """Test error handling for invalid candidates. / 测试无效 candidates 的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -380,11 +380,11 @@ class TestLLMRerankerReranking:
             reranker.rerank("test query", [])
     
     def test_rerank_llm_failure(self, mock_settings, sample_prompt, sample_candidates, tmp_path):
-        """Test error handling when LLM call fails."""
+        """Test error handling when LLM call fails. / 测试 LLM 调用失败时的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
-        # Mock LLM that raises exception
+        # Mock LLM that raises exception / 会抛出异常的 Mock LLM
         class FailingLLM(BaseLLM):
             def chat(self, messages, trace=None, **kwargs):
                 raise RuntimeError("LLM service unavailable")
@@ -399,7 +399,7 @@ class TestLLMRerankerReranking:
             reranker.rerank("test query", sample_candidates)
     
     def test_rerank_malformed_response(self, mock_settings, sample_prompt, sample_candidates, tmp_path):
-        """Test error handling for malformed LLM response."""
+        """Test error handling for malformed LLM response. / 测试畸形 LLM 响应的错误处理。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -414,7 +414,7 @@ class TestLLMRerankerReranking:
             reranker.rerank("test query", sample_candidates)
     
     def test_rerank_preserves_original_fields(self, mock_settings, sample_prompt, tmp_path):
-        """Test that reranking preserves original candidate fields."""
+        """Test that reranking preserves original candidate fields. / 测试 reranking 会保留原始 candidate 字段。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -437,7 +437,7 @@ class TestLLMRerankerReranking:
         
         reranked = reranker.rerank("test", candidates)
         
-        # Check original fields preserved
+        # Check original fields preserved / 检查原始字段已保留
         assert reranked[0]["text"] == "Text 1"
         assert reranked[0]["score"] == 0.8
         assert reranked[0]["metadata"]["key"] == "value"
@@ -450,10 +450,10 @@ class TestLLMRerankerReranking:
 
 
 class TestLLMRerankerIntegration:
-    """Integration tests for LLM Reranker."""
+    """Integration tests for LLM Reranker. / LLM Reranker 的集成测试。"""
     
     def test_rerank_with_trace_context(self, mock_settings, sample_prompt, sample_candidates, tmp_path):
-        """Test reranking with trace context passed through."""
+        """Test reranking with trace context passed through. / 测试 reranking 时透传 trace context。"""
         prompt_file = tmp_path / "rerank.txt"
         prompt_file.write_text(sample_prompt)
         
@@ -477,5 +477,5 @@ class TestLLMRerankerIntegration:
         
         reranker.rerank("query", candidates, trace=mock_trace)
         
-        # Verify LLM was called with multiple candidates
+        # Verify LLM was called with multiple candidates / 验证 LLM 被以多个 candidates 调用
         assert mock_llm.call_count == 1

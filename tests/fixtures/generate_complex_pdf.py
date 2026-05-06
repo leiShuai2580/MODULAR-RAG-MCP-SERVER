@@ -1,6 +1,6 @@
 """
-Generate a complex PDF for testing purposes.
-Contains multiple pages, text, images, tables, and various formatting.
+Generate a complex PDF for testing purposes. / 生成用于测试的复杂 PDF。
+Contains multiple pages, text, images, tables, and various formatting. / 包含多页、文本、图片、表格和多种格式。
 """
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter, A4
@@ -17,17 +17,17 @@ from pathlib import Path
 
 
 def create_sample_image(width=400, height=300, color='blue'):
-    """Create a simple colored image with text."""
+    """Create a simple colored image with text. / 创建带文本的简单彩色图片。"""
     from PIL import ImageDraw, ImageFont
     
     img = PILImage.new('RGB', (width, height), color=color)
     draw = ImageDraw.Draw(img)
     
-    # Draw some shapes
+    # Draw some shapes / 绘制一些形状
     draw.rectangle([50, 50, width-50, height-50], outline='white', width=5)
     draw.ellipse([100, 100, width-100, height-100], fill='lightblue', outline='darkblue')
     
-    # Add text
+    # Add text / 添加文本
     try:
         draw.text((width//2-100, height//2-10), f"Sample {color.capitalize()} Image", 
                   fill='white')
@@ -38,9 +38,9 @@ def create_sample_image(width=400, height=300, color='blue'):
 
 
 def generate_complex_pdf(output_path):
-    """Generate a complex PDF document for testing."""
+    """Generate a complex PDF document for testing. / 生成用于测试的复杂 PDF 文档。"""
     
-    # Create the PDF document
+    # Create the PDF document / 创建 PDF 文档
     doc = SimpleDocTemplate(
         str(output_path),
         pagesize=letter,
@@ -50,13 +50,13 @@ def generate_complex_pdf(output_path):
         bottomMargin=18,
     )
     
-    # Container for the 'Flowable' objects
+    # Container for the 'Flowable' objects / 'Flowable' 对象容器
     elements = []
     
-    # Define styles
+    # Define styles / 定义样式
     styles = getSampleStyleSheet()
     
-    # Custom styles
+    # Custom styles / 自定义样式
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
@@ -86,7 +86,7 @@ def generate_complex_pdf(output_path):
         leading=14
     )
     
-    # Title Page
+    # Title Page / 标题页
     elements.append(Spacer(1, 2*inch))
     elements.append(Paragraph("Advanced RAG System", title_style))
     elements.append(Paragraph("Technical Documentation & Testing Guide", styles['Heading2']))
@@ -94,7 +94,7 @@ def generate_complex_pdf(output_path):
     elements.append(Paragraph("Version 2.0 - February 2026", styles['Normal']))
     elements.append(Spacer(1, 0.5*inch))
     
-    # Add author info
+    # Add author info / 添加作者信息
     author_data = [
         ['Author:', 'AI Research Team'],
         ['Department:', 'Machine Learning Division'],
@@ -111,7 +111,7 @@ def generate_complex_pdf(output_path):
     elements.append(author_table)
     elements.append(PageBreak())
     
-    # Table of Contents
+    # Table of Contents / 目录
     elements.append(Paragraph("Table of Contents", heading_style))
     toc_items = [
         "1. Introduction to Modular RAG Systems",
@@ -127,7 +127,7 @@ def generate_complex_pdf(output_path):
         elements.append(Paragraph(item, styles['Normal']))
     elements.append(PageBreak())
     
-    # Chapter 1: Introduction
+    # Chapter 1: Introduction / 第 1 章：介绍
     elements.append(Paragraph("1. Introduction to Modular RAG Systems", heading_style))
     
     intro_text = """
@@ -147,7 +147,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(intro_text2, body_style))
     
-    # Key Features List
+    # Key Features List / 关键特性列表
     elements.append(Paragraph("<b>Key Features:</b>", body_style))
     features = [
         "Multiple embedding provider support (OpenAI, Azure, Ollama, Sentence Transformers)",
@@ -165,7 +165,7 @@ def generate_complex_pdf(output_path):
     elements.append(feature_list)
     elements.append(Spacer(1, 0.3*inch))
     
-    # Chapter 2: Architecture
+    # Chapter 2: Architecture / 第 2 章：架构
     elements.append(Paragraph("2. System Architecture Overview", heading_style))
     
     arch_text = """
@@ -177,7 +177,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(arch_text, body_style))
     
-    # Architecture Components Table
+    # Architecture Components Table / 架构组件表
     elements.append(Paragraph("<b>Core Components:</b>", body_style))
     arch_data = [
         ['Component', 'Purpose', 'Key Technologies'],
@@ -204,7 +204,7 @@ def generate_complex_pdf(output_path):
     elements.append(arch_table)
     elements.append(PageBreak())
     
-    # Chapter 3: Chunking
+    # Chapter 3: Chunking / 第 3 章：分块
     elements.append(Paragraph("3. Chunking Strategies and Implementation", heading_style))
     
     chunk_text = """
@@ -215,7 +215,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(chunk_text, body_style))
     
-    # Add first image
+    # Add first image / 添加第一张图片
     img1 = create_sample_image(400, 250, 'steelblue')
     img_buffer1 = io.BytesIO()
     img1.save(img_buffer1, format='PNG')
@@ -237,7 +237,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(chunk_text2, body_style))
     
-    # Chunking parameters table
+    # Chunking parameters table / 分块参数表
     chunk_params = [
         ['Parameter', 'Default Value', 'Description'],
         ['chunk_size', '512', 'Target characters per chunk'],
@@ -260,7 +260,7 @@ def generate_complex_pdf(output_path):
     elements.append(param_table)
     elements.append(PageBreak())
     
-    # Chapter 4: Embeddings
+    # Chapter 4: Embeddings / 第 4 章：嵌入
     elements.append(Paragraph("4. Embedding Models and Vector Storage", heading_style))
     
     embed_text = """
@@ -272,7 +272,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(embed_text, body_style))
     
-    # Provider comparison
+    # Provider comparison / Provider 对比
     provider_data = [
         ['Provider', 'Dimension', 'Speed', 'Cost', 'Quality'],
         ['OpenAI Ada-002', '1536', 'Fast', 'Low', 'High'],
@@ -294,7 +294,7 @@ def generate_complex_pdf(output_path):
     elements.append(provider_table)
     elements.append(Spacer(1, 0.2*inch))
     
-    # Add second image
+    # Add second image / 添加第二张图片
     img2 = create_sample_image(400, 250, 'seagreen')
     img_buffer2 = io.BytesIO()
     img2.save(img_buffer2, format='PNG')
@@ -306,7 +306,7 @@ def generate_complex_pdf(output_path):
                               styles['Normal']))
     elements.append(PageBreak())
     
-    # Chapter 5: Retrieval
+    # Chapter 5: Retrieval / 第 5 章：检索
     elements.append(Paragraph("5. Retrieval Mechanisms", heading_style))
     
     retrieval_text = """
@@ -327,7 +327,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(retrieval_text2, body_style))
     
-    # Chapter 6: Performance
+    # Chapter 6: Performance / 第 6 章：性能
     elements.append(Paragraph("6. Performance Benchmarks", heading_style))
     
     perf_text = """
@@ -338,7 +338,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(perf_text, body_style))
     
-    # Performance metrics table
+    # Performance metrics table / 性能指标表
     perf_data = [
         ['Metric', 'Pure Dense', 'Pure Sparse', 'Hybrid + Rerank'],
         ['Precision@5', '0.72', '0.68', '0.85'],
@@ -361,7 +361,7 @@ def generate_complex_pdf(output_path):
     elements.append(perf_table)
     elements.append(PageBreak())
     
-    # Chapter 7: Visual Components
+    # Chapter 7: Visual Components / 第 7 章：视觉组件
     elements.append(Paragraph("7. Visual Components Analysis", heading_style))
     
     visual_text = """
@@ -373,7 +373,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(visual_text, body_style))
     
-    # Add third image
+    # Add third image / 添加第三张图片
     img3 = create_sample_image(400, 250, 'coral')
     img_buffer3 = io.BytesIO()
     img3.save(img_buffer3, format='PNG')
@@ -395,7 +395,7 @@ def generate_complex_pdf(output_path):
     elements.append(Paragraph(visual_text2, body_style))
     elements.append(PageBreak())
     
-    # Chapter 8: Future Work
+    # Chapter 8: Future Work / 第 8 章：未来工作
     elements.append(Paragraph("8. Future Enhancements", heading_style))
     
     future_text = """
@@ -408,7 +408,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(future_text, body_style))
     
-    # Future features
+    # Future features / 未来特性
     future_features = [
         "Multi-document reasoning and cross-reference resolution",
         "Knowledge graph integration for entity-based retrieval",
@@ -425,7 +425,7 @@ def generate_complex_pdf(output_path):
     elements.append(future_list)
     elements.append(Spacer(1, 0.5*inch))
     
-    # Conclusion
+    # Conclusion / 结论
     conclusion_text = """
     This modular RAG system provides a robust foundation for building intelligent 
     information retrieval applications. Through careful design, comprehensive testing, 
@@ -435,7 +435,7 @@ def generate_complex_pdf(output_path):
     """
     elements.append(Paragraph(conclusion_text, body_style))
     
-    # Build PDF
+    # Build PDF / 构建 PDF
     doc.build(elements)
     print(f"PDF generated successfully: {output_path}")
 

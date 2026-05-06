@@ -1,8 +1,8 @@
-"""Dense Retriever for semantic search using vector embeddings.
+"""Dense Retriever for semantic search using vector embeddings. / 基于向量嵌入进行语义搜索的稠密检索器。
 
-This module implements the DenseRetriever component that performs semantic search
-by embedding the query and retrieving similar chunks from the vector store.
-It forms the Dense route in the Hybrid Search Engine.
+This module implements the DenseRetriever component that performs semantic search / 本模块实现 DenseRetriever 组件，用于执行语义搜索，
+by embedding the query and retrieving similar chunks from the vector store. / 通过对查询进行向量化，并从向量存储中检索相似分块来完成。
+It forms the Dense route in the Hybrid Search Engine. / 它构成混合搜索引擎中的稠密检索路径。
 """
 
 from __future__ import annotations
@@ -21,26 +21,26 @@ logger = logging.getLogger(__name__)
 
 
 class DenseRetriever:
-    """Dense retriever using embedding-based semantic search.
+    """Dense retriever using embedding-based semantic search. / 使用基于嵌入的语义搜索的稠密检索器。
     
-    This class performs semantic retrieval by:
-    1. Embedding the query using the configured embedding client
-    2. Querying the vector store for similar vectors
-    3. Returning normalized RetrievalResult objects
+    This class performs semantic retrieval by: / 该类通过以下步骤执行语义检索：
+    1. Embedding the query using the configured embedding client / 1. 使用已配置的嵌入客户端对查询进行向量化
+    2. Querying the vector store for similar vectors / 2. 查询向量存储以获取相似向量
+    3. Returning normalized RetrievalResult objects / 3. 返回标准化的 RetrievalResult 对象
     
-    Design Principles Applied:
-    - Pluggable: Accepts embedding_client and vector_store via dependency injection.
-    - Config-Driven: Default top_k read from settings.retrieval.dense_top_k.
-    - Observable: Accepts optional TraceContext for observability integration.
-    - Fail-Fast: Validates inputs early with clear error messages.
-    - Type-Safe: Returns standardized RetrievalResult objects.
+    Design Principles Applied: / 应用的设计原则：
+    - Pluggable: Accepts embedding_client and vector_store via dependency injection. / - 可插拔：通过依赖注入接收 embedding_client 和 vector_store。
+    - Config-Driven: Default top_k read from settings.retrieval.dense_top_k. / - 配置驱动：默认 top_k 从 settings.retrieval.dense_top_k 读取。
+    - Observable: Accepts optional TraceContext for observability integration. / - 可观测：接收可选的 TraceContext 用于可观测性集成。
+    - Fail-Fast: Validates inputs early with clear error messages. / - 快速失败：尽早校验输入并给出清晰错误信息。
+    - Type-Safe: Returns standardized RetrievalResult objects. / - 类型安全：返回标准化的 RetrievalResult 对象。
     
-    Attributes:
-        embedding_client: The embedding provider for query vectorization.
-        vector_store: The vector store for similarity search.
-        default_top_k: Default number of results to return.
+    Attributes: / 属性：
+        embedding_client: The embedding provider for query vectorization. / embedding_client：用于查询向量化的嵌入提供方。
+        vector_store: The vector store for similarity search. / vector_store：用于相似性搜索的向量存储。
+        default_top_k: Default number of results to return. / default_top_k：默认返回结果数量。
     
-    Example:
+    Example: / 示例：
         >>> from src.libs.embedding.embedding_factory import EmbeddingFactory
         >>> from src.libs.vector_store.vector_store_factory import VectorStoreFactory
         >>> 
@@ -63,28 +63,28 @@ class DenseRetriever:
         vector_store: Optional[BaseVectorStore] = None,
         default_top_k: int = 10,
     ) -> None:
-        """Initialize DenseRetriever with dependencies.
+        """Initialize DenseRetriever with dependencies. / 使用依赖项初始化 DenseRetriever。
         
-        Args:
-            settings: Application settings. Used to extract default_top_k if not provided.
-            embedding_client: Embedding provider for query vectorization.
-                              Required for actual retrieval operations.
-            vector_store: Vector store for similarity search.
-                          Required for actual retrieval operations.
-            default_top_k: Default number of results to return (default: 10).
-                           Can be overridden from settings.retrieval.dense_top_k.
+        Args: / 参数：
+            settings: Application settings. Used to extract default_top_k if not provided. / settings：应用配置。如果未提供 default_top_k，则用于提取默认值。
+            embedding_client: Embedding provider for query vectorization. / embedding_client：用于查询向量化的嵌入提供方。
+                              Required for actual retrieval operations. / 实际执行检索操作时必需。
+            vector_store: Vector store for similarity search. / vector_store：用于相似性搜索的向量存储。
+                          Required for actual retrieval operations. / 实际执行检索操作时必需。
+            default_top_k: Default number of results to return (default: 10). / default_top_k：默认返回结果数量（默认值：10）。
+                           Can be overridden from settings.retrieval.dense_top_k. / 可被 settings.retrieval.dense_top_k 覆盖。
         
-        Raises:
-            ValueError: If embedding_client or vector_store is None when required.
+        Raises: / 异常：
+            ValueError: If embedding_client or vector_store is None when required. / ValueError：当必需的 embedding_client 或 vector_store 为 None 时抛出。
         
-        Note:
-            Dependencies can be injected for testing (with mocks) or for
-            production use (with real implementations from factories).
+        Note: / 说明：
+            Dependencies can be injected for testing (with mocks) or for / 可以注入依赖项用于测试（使用 mock），也可以用于
+            production use (with real implementations from factories). / 生产环境（使用工厂创建的真实实现）。
         """
         self.embedding_client = embedding_client
         self.vector_store = vector_store
         
-        # Extract default_top_k from settings if available
+        # Extract default_top_k from settings if available / 如果配置可用，则从配置中提取 default_top_k
         self.default_top_k = default_top_k
         if settings is not None:
             retrieval_config = getattr(settings, 'retrieval', None)
@@ -104,38 +104,38 @@ class DenseRetriever:
         filters: Optional[Dict[str, Any]] = None,
         trace: Optional[Any] = None,
     ) -> List[RetrievalResult]:
-        """Retrieve semantically similar chunks for a query.
+        """Retrieve semantically similar chunks for a query. / 为查询检索语义相似的分块。
         
-        Args:
-            query: The search query string. Must not be empty.
-            top_k: Maximum number of results to return. If None, uses default_top_k.
-            filters: Optional metadata filters (e.g., {"collection": "api-docs"}).
-            trace: Optional TraceContext for observability (reserved for Stage F).
+        Args: / 参数：
+            query: The search query string. Must not be empty. / query：搜索查询字符串，不能为空。
+            top_k: Maximum number of results to return. If None, uses default_top_k. / top_k：最大返回结果数量。如果为 None，则使用 default_top_k。
+            filters: Optional metadata filters (e.g., {"collection": "api-docs"}). / filters：可选的元数据过滤条件（例如 {"collection": "api-docs"}）。
+            trace: Optional TraceContext for observability (reserved for Stage F). / trace：用于可观测性的可选 TraceContext（为阶段 F 预留）。
         
-        Returns:
-            List of RetrievalResult objects, sorted by similarity (descending).
-            Each result contains chunk_id, score, text, and metadata.
+        Returns: / 返回：
+            List of RetrievalResult objects, sorted by similarity (descending). / RetrievalResult 对象列表，按相似度降序排序。
+            Each result contains chunk_id, score, text, and metadata. / 每个结果包含 chunk_id、score、text 和 metadata。
         
-        Raises:
-            ValueError: If query is empty or invalid.
-            RuntimeError: If embedding_client or vector_store is not configured,
-                          or if the retrieval operation fails.
+        Raises: / 异常：
+            ValueError: If query is empty or invalid. / ValueError：当 query 为空或无效时抛出。
+            RuntimeError: If embedding_client or vector_store is not configured, / RuntimeError：当 embedding_client 或 vector_store 未配置，
+                          or if the retrieval operation fails. / 或检索操作失败时抛出。
         
-        Example:
+        Example: / 示例：
             >>> results = retriever.retrieve("How to configure Azure OpenAI?")
             >>> for result in results:
             ...     print(f"[{result.score:.2f}] {result.chunk_id}: {result.text[:50]}...")
         """
-        # Validate inputs
+        # Validate inputs / 校验输入
         self._validate_query(query)
         self._validate_dependencies()
         
-        # Use default top_k if not specified
+        # Use default top_k if not specified / 如果未指定 top_k，则使用默认 top_k
         effective_top_k = top_k if top_k is not None else self.default_top_k
         
         logger.debug(f"Retrieving for query='{query[:50]}...', top_k={effective_top_k}")
         
-        # Step 1: Embed the query
+        # Step 1: Embed the query / 第 1 步：对查询进行向量化
         try:
             query_vectors = self.embedding_client.embed([query], trace=trace)
             query_vector = query_vectors[0]
@@ -145,7 +145,7 @@ class DenseRetriever:
                 "Check embedding client configuration and connectivity."
             ) from e
         
-        # Step 2: Query the vector store
+        # Step 2: Query the vector store / 第 2 步：查询向量存储
         try:
             raw_results = self.vector_store.query(
                 vector=query_vector,
@@ -159,20 +159,20 @@ class DenseRetriever:
                 "Check vector store configuration and data availability."
             ) from e
         
-        # Step 3: Transform to RetrievalResult objects
+        # Step 3: Transform to RetrievalResult objects / 第 3 步：转换为 RetrievalResult 对象
         results = self._transform_results(raw_results)
         
         logger.debug(f"Retrieved {len(results)} results for query")
         return results
     
     def _validate_query(self, query: str) -> None:
-        """Validate the query string.
+        """Validate the query string. / 校验查询字符串。
         
-        Args:
-            query: Query string to validate.
+        Args: / 参数：
+            query: Query string to validate. / query：待校验的查询字符串。
         
-        Raises:
-            ValueError: If query is empty or not a string.
+        Raises: / 异常：
+            ValueError: If query is empty or not a string. / ValueError：当 query 为空或不是字符串时抛出。
         """
         if not isinstance(query, str):
             raise ValueError(
@@ -182,10 +182,10 @@ class DenseRetriever:
             raise ValueError("Query cannot be empty or whitespace-only")
     
     def _validate_dependencies(self) -> None:
-        """Validate that required dependencies are configured.
+        """Validate that required dependencies are configured. / 校验必需依赖是否已配置。
         
-        Raises:
-            RuntimeError: If embedding_client or vector_store is None.
+        Raises: / 异常：
+            RuntimeError: If embedding_client or vector_store is None. / RuntimeError：当 embedding_client 或 vector_store 为 None 时抛出。
         """
         if self.embedding_client is None:
             raise RuntimeError(
@@ -202,14 +202,14 @@ class DenseRetriever:
         self,
         raw_results: List[Dict[str, Any]],
     ) -> List[RetrievalResult]:
-        """Transform raw vector store results to RetrievalResult objects.
+        """Transform raw vector store results to RetrievalResult objects. / 将原始向量存储结果转换为 RetrievalResult 对象。
         
-        Args:
-            raw_results: Raw results from vector store query.
-                         Each result should have: id, score, text, metadata.
+        Args: / 参数：
+            raw_results: Raw results from vector store query. / raw_results：来自向量存储查询的原始结果。
+                         Each result should have: id, score, text, metadata. / 每个结果应包含：id、score、text、metadata。
         
-        Returns:
-            List of RetrievalResult objects.
+        Returns: / 返回：
+            List of RetrievalResult objects. / RetrievalResult 对象列表。
         """
         results = []
         for raw in raw_results:
@@ -236,26 +236,26 @@ def create_dense_retriever(
     embedding_client: Optional[BaseEmbedding] = None,
     vector_store: Optional[BaseVectorStore] = None,
 ) -> DenseRetriever:
-    """Factory function to create a DenseRetriever with optional dependency injection.
+    """Factory function to create a DenseRetriever with optional dependency injection. / 用于创建 DenseRetriever 的工厂函数，支持可选依赖注入。
     
-    This function simplifies DenseRetriever creation by automatically creating
-    dependencies from factories if not provided.
+    This function simplifies DenseRetriever creation by automatically creating / 该函数通过在未提供依赖时自动从工厂创建依赖，
+    dependencies from factories if not provided. / 简化 DenseRetriever 的创建过程。
     
-    Args:
-        settings: Application settings.
-        embedding_client: Optional pre-configured embedding client.
-                          If None, created from EmbeddingFactory.
-        vector_store: Optional pre-configured vector store.
-                      If None, created from VectorStoreFactory.
+    Args: / 参数：
+        settings: Application settings. / settings：应用配置。
+        embedding_client: Optional pre-configured embedding client. / embedding_client：可选的预配置嵌入客户端。
+                          If None, created from EmbeddingFactory. / 如果为 None，则从 EmbeddingFactory 创建。
+        vector_store: Optional pre-configured vector store. / vector_store：可选的预配置向量存储。
+                      If None, created from VectorStoreFactory. / 如果为 None，则从 VectorStoreFactory 创建。
     
-    Returns:
-        Configured DenseRetriever instance.
+    Returns: / 返回：
+        Configured DenseRetriever instance. / 配置完成的 DenseRetriever 实例。
     
-    Example:
+    Example: / 示例：
         >>> settings = Settings.load('config/settings.yaml')
         >>> retriever = create_dense_retriever(settings)
     """
-    # Lazy import to avoid circular dependencies
+    # Lazy import to avoid circular dependencies / 延迟导入以避免循环依赖
     if embedding_client is None:
         from src.libs.embedding.embedding_factory import EmbeddingFactory
         embedding_client = EmbeddingFactory.create(settings)

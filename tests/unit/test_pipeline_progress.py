@@ -1,7 +1,7 @@
-"""Tests for F5 – Pipeline on_progress callback.
+"""Tests for F5 – Pipeline on_progress callback. / F5 Pipeline on_progress 回调测试。
 
-Verifies that IngestionPipeline.run() fires the optional on_progress
-callback at each pipeline stage with (stage_name, current, total).
+Verifies that IngestionPipeline.run() fires the optional on_progress / 验证 IngestionPipeline.run() 会在每个流水线阶段触发可选的 on_progress
+callback at each pipeline stage with (stage_name, current, total). / 回调，并传入（stage_name、current、total）。
 """
 
 from typing import List, Tuple
@@ -14,11 +14,11 @@ from src.core.types import Document, Chunk
 from src.ingestion.pipeline import IngestionPipeline
 
 
-# ── Helpers ──────────────────────────────────────────────────────────
+# ── Helpers / 辅助函数 ───────────────────────────────────────────────
 
 
 def _make_fake_pipeline() -> object:
-    """Build a fake IngestionPipeline that doesn't require real settings."""
+    """Build a fake IngestionPipeline that doesn't require real settings. / 构建不需要真实 settings 的假 IngestionPipeline。"""
 
     class FP:
         collection = "test"
@@ -26,18 +26,18 @@ def _make_fake_pipeline() -> object:
 
     fp = FP()
 
-    # Stage 1: integrity
+    # Stage 1: integrity / 阶段 1：完整性
     fp.integrity_checker = MagicMock()
     fp.integrity_checker.compute_sha256.return_value = "hash123"
     fp.integrity_checker.should_skip.return_value = False
 
-    # Stage 2: loader
+    # Stage 2: loader / 阶段 2：loader
     fp.loader = MagicMock()
     fp.loader.load.return_value = Document(
         id="doc1", text="Hello world. " * 50, metadata={"source_path": "test.pdf", "images": []}
     )
 
-    # Stage 3: chunker
+    # Stage 3: chunker / 阶段 3：chunker
     chunks = [
         Chunk(id=f"c{i}", text=f"Chunk {i} text. " * 5, metadata={"source_path": "test.pdf"})
         for i in range(3)
@@ -45,7 +45,7 @@ def _make_fake_pipeline() -> object:
     fp.chunker = MagicMock()
     fp.chunker.split_document.return_value = chunks
 
-    # Stage 4: transforms
+    # Stage 4: transforms / 阶段 4：transforms
     fp.chunk_refiner = MagicMock()
     fp.chunk_refiner.transform.return_value = chunks
     fp.metadata_enricher = MagicMock()
@@ -53,14 +53,14 @@ def _make_fake_pipeline() -> object:
     fp.image_captioner = MagicMock()
     fp.image_captioner.transform.return_value = chunks
 
-    # Stage 5: encoding
+    # Stage 5: encoding / 阶段 5：encoding
     batch_result = MagicMock()
     batch_result.dense_vectors = [[0.1, 0.2]] * 3
     batch_result.sparse_stats = [{"doc_id": f"c{i}"} for i in range(3)]
     fp.batch_processor = MagicMock()
     fp.batch_processor.process.return_value = batch_result
 
-    # Stage 6: storage
+    # Stage 6: storage / 阶段 6：storage
     fp.vector_upserter = MagicMock()
     fp.vector_upserter.upsert.return_value = ["v0", "v1", "v2"]
     fp.bm25_indexer = MagicMock()
@@ -70,7 +70,7 @@ def _make_fake_pipeline() -> object:
 
 
 def _collect_progress(fp) -> List[Tuple[str, int, int]]:
-    """Run pipeline with a callback and return collected calls."""
+    """Run pipeline with a callback and return collected calls. / 使用回调运行 pipeline 并返回收集到的调用。"""
     calls: List[Tuple[str, int, int]] = []
 
     def on_progress(stage: str, current: int, total: int) -> None:
@@ -80,11 +80,11 @@ def _collect_progress(fp) -> List[Tuple[str, int, int]]:
     return calls
 
 
-# ── Tests ────────────────────────────────────────────────────────────
+# ── Tests / 测试 ─────────────────────────────────────────────────────
 
 
 class TestPipelineProgressCallback:
-    """Verify on_progress is called correctly."""
+    """Verify on_progress is called correctly. / 验证 on_progress 被正确调用。"""
 
     def test_callback_called_for_all_stages(self) -> None:
         fp = _make_fake_pipeline()
@@ -111,13 +111,13 @@ class TestPipelineProgressCallback:
         assert currents == list(range(1, 7))
 
     def test_no_callback_no_crash(self) -> None:
-        """on_progress=None should not break anything."""
+        """on_progress=None should not break anything. / on_progress=None 不应破坏任何逻辑。"""
         fp = _make_fake_pipeline()
         result = IngestionPipeline.run(fp, "test.pdf", on_progress=None)
         assert result.success
 
     def test_callback_with_trace(self) -> None:
-        """on_progress + trace both work together."""
+        """on_progress + trace both work together. / on_progress 与 trace 应可共同工作。"""
         fp = _make_fake_pipeline()
         calls: List[Tuple[str, int, int]] = []
         trace = TraceContext(trace_type="ingestion")
@@ -127,7 +127,7 @@ class TestPipelineProgressCallback:
 
         IngestionPipeline.run(fp, "test.pdf", trace=trace, on_progress=on_progress)
         assert len(calls) == 6
-        assert len(trace.stages) >= 5  # trace records from F4
+        assert len(trace.stages) >= 5  # trace records from F4 / 来自 F4 的 trace 记录
 
     def test_ordering(self) -> None:
         fp = _make_fake_pipeline()

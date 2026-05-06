@@ -1,8 +1,8 @@
-"""Generate sample PDF files for testing.
+"""Generate sample PDF files for testing. / 生成用于测试的示例 PDF 文件。
 
-This script creates:
-1. simple.pdf - A plain text PDF with title and paragraphs
-2. with_images.pdf - A PDF containing text and an image (placeholder for now)
+This script creates: / 该脚本创建：
+1. simple.pdf - A plain text PDF with title and paragraphs / simple.pdf - 包含标题和段落的纯文本 PDF
+2. with_images.pdf - A PDF containing text and an image (placeholder for now) / with_images.pdf - 包含文本和图片的 PDF（目前为占位）
 """
 
 from pathlib import Path
@@ -16,21 +16,21 @@ import io
 
 
 def create_simple_pdf():
-    """Create a simple text-only PDF."""
+    """Create a simple text-only PDF. / 创建一个简单的纯文本 PDF。"""
     filepath = Path(__file__).parent / "simple.pdf"
     
     c = canvas.Canvas(str(filepath), pagesize=letter)
     width, height = letter
     
-    # Title
+    # Title / 标题
     c.setFont("Helvetica-Bold", 24)
     c.drawString(1*inch, height - 1*inch, "Sample Document")
     
-    # Subtitle
+    # Subtitle / 副标题
     c.setFont("Helvetica", 14)
     c.drawString(1*inch, height - 1.5*inch, "A Simple Test PDF")
     
-    # Paragraph 1
+    # Paragraph 1 / 段落 1
     c.setFont("Helvetica", 11)
     y_position = height - 2.5*inch
     
@@ -47,7 +47,7 @@ def create_simple_pdf():
         c.drawString(1*inch, y_position, line)
         y_position -= 0.25*inch
     
-    # Add a section heading
+    # Add a section heading / 添加章节标题
     y_position -= 0.5*inch
     c.setFont("Helvetica-Bold", 14)
     c.drawString(1*inch, y_position, "Section 1: Introduction")
@@ -63,16 +63,16 @@ def create_simple_pdf():
 
 
 def create_pdf_with_images():
-    """Create a PDF with text and a simple image."""
+    """Create a PDF with text and a simple image. / 创建包含文本和简单图片的 PDF。"""
     filepath = Path(__file__).parent / "with_images.pdf"
     
-    # Create a simple test image
+    # Create a simple test image / 创建简单测试图片
     img = Image.new('RGB', (200, 100), color='lightblue')
     img_buffer = io.BytesIO()
     img.save(img_buffer, format='PNG')
     img_buffer.seek(0)
     
-    # Save temp image
+    # Save temp image / 保存临时图片
     temp_img = Path(__file__).parent / "temp_test_image.png"
     with open(temp_img, 'wb') as f:
         f.write(img_buffer.getvalue())
@@ -80,20 +80,20 @@ def create_pdf_with_images():
     c = canvas.Canvas(str(filepath), pagesize=letter)
     width, height = letter
     
-    # Title
+    # Title / 标题
     c.setFont("Helvetica-Bold", 24)
     c.drawString(1*inch, height - 1*inch, "Document with Images")
     
-    # Text before image
+    # Text before image / 图片前文本
     c.setFont("Helvetica", 11)
     y_position = height - 1.8*inch
     c.drawString(1*inch, y_position, "This document contains an embedded image below:")
     
-    # Add image
+    # Add image / 添加图片
     y_position -= 1.5*inch
     c.drawImage(str(temp_img), 1*inch, y_position, width=2*inch, height=1*inch)
     
-    # Text after image
+    # Text after image / 图片后文本
     y_position -= 0.5*inch
     c.drawString(1*inch, y_position, "Text continues after the image.")
     y_position -= 0.25*inch
@@ -101,7 +101,7 @@ def create_pdf_with_images():
     
     c.save()
     
-    # Clean up temp image
+    # Clean up temp image / 清理临时图片
     temp_img.unlink()
     
     print(f"✅ Created: {filepath}")

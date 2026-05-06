@@ -1,15 +1,15 @@
-"""Unit tests for RRF Fusion (Reciprocal Rank Fusion).
+"""Unit tests for RRF Fusion (Reciprocal Rank Fusion). / RRF Fusion（Reciprocal Rank Fusion）的单元测试。
 
-This module tests the RRFFusion class for combining multiple retrieval
-ranking lists into a unified ranking using the RRF algorithm.
+This module tests the RRFFusion class for combining multiple retrieval / 该模块测试 RRFFusion 类如何使用 RRF 算法
+ranking lists into a unified ranking using the RRF algorithm. / 将多个检索排序列表合并为统一排序。
 
-Test Categories:
-1. Initialization tests
-2. Basic fusion functionality
-3. Deterministic behavior verification
-4. Edge cases and error handling
-5. Weighted fusion tests
-6. Utility function tests
+Test Categories: / 测试类别：
+1. Initialization tests / 初始化测试
+2. Basic fusion functionality / 基础融合功能
+3. Deterministic behavior verification / 确定性行为验证
+4. Edge cases and error handling / 边界情况和错误处理
+5. Weighted fusion tests / 加权融合测试
+6. Utility function tests / 工具函数测试
 """
 
 import pytest
@@ -20,24 +20,24 @@ from src.core.query_engine.fusion import RRFFusion, rrf_score
 
 
 # =============================================================================
-# Test Fixtures
+# Test Fixtures / 测试 Fixture
 # =============================================================================
 
 @pytest.fixture
 def fusion_default() -> RRFFusion:
-    """Create RRFFusion with default k=60."""
+    """Create RRFFusion with default k=60. / 创建默认 k=60 的 RRFFusion。"""
     return RRFFusion()
 
 
 @pytest.fixture
 def fusion_k20() -> RRFFusion:
-    """Create RRFFusion with k=20 for testing k-sensitivity."""
+    """Create RRFFusion with k=20 for testing k-sensitivity. / 创建 k=20 的 RRFFusion 用于测试 k 敏感性。"""
     return RRFFusion(k=20)
 
 
 @pytest.fixture
 def dense_results() -> List[RetrievalResult]:
-    """Sample dense retrieval results (3 documents: a, b, c)."""
+    """Sample dense retrieval results (3 documents: a, b, c). / 示例 dense 检索结果（3 个文档：a、b、c）。"""
     return [
         RetrievalResult(chunk_id="a", score=0.95, text="Dense text A", metadata={"source": "dense", "page": 1}),
         RetrievalResult(chunk_id="b", score=0.85, text="Dense text B", metadata={"source": "dense", "page": 2}),
@@ -47,7 +47,7 @@ def dense_results() -> List[RetrievalResult]:
 
 @pytest.fixture
 def sparse_results() -> List[RetrievalResult]:
-    """Sample sparse retrieval results (3 documents: b, c, d)."""
+    """Sample sparse retrieval results (3 documents: b, c, d). / 示例 sparse 检索结果（3 个文档：b、c、d）。"""
     return [
         RetrievalResult(chunk_id="b", score=5.2, text="Sparse text B", metadata={"source": "sparse", "page": 2}),
         RetrievalResult(chunk_id="c", score=4.1, text="Sparse text C", metadata={"source": "sparse", "page": 3}),
@@ -57,7 +57,7 @@ def sparse_results() -> List[RetrievalResult]:
 
 @pytest.fixture
 def disjoint_results_1() -> List[RetrievalResult]:
-    """Results with no overlap (set 1)."""
+    """Results with no overlap (set 1). / 无重叠结果（集合 1）。"""
     return [
         RetrievalResult(chunk_id="x", score=0.9, text="Text X", metadata={}),
         RetrievalResult(chunk_id="y", score=0.8, text="Text Y", metadata={}),
@@ -66,7 +66,7 @@ def disjoint_results_1() -> List[RetrievalResult]:
 
 @pytest.fixture
 def disjoint_results_2() -> List[RetrievalResult]:
-    """Results with no overlap (set 2)."""
+    """Results with no overlap (set 2). / 无重叠结果（集合 2）。"""
     return [
         RetrievalResult(chunk_id="p", score=5.0, text="Text P", metadata={}),
         RetrievalResult(chunk_id="q", score=4.0, text="Text Q", metadata={}),
@@ -74,24 +74,24 @@ def disjoint_results_2() -> List[RetrievalResult]:
 
 
 # =============================================================================
-# Initialization Tests
+# Initialization Tests / 初始化测试
 # =============================================================================
 
 class TestRRFFusionInit:
-    """Tests for RRFFusion initialization."""
+    """Tests for RRFFusion initialization. / RRFFusion 初始化测试。"""
     
     def test_default_k_is_60(self):
-        """Default k should be 60 as per original RRF paper."""
+        """Default k should be 60 as per original RRF paper. / 根据原始 RRF 论文，默认 k 应为 60。"""
         fusion = RRFFusion()
         assert fusion.k == 60
     
     def test_custom_k_value(self):
-        """Should accept custom k values."""
+        """Should accept custom k values. / 应接受自定义 k 值。"""
         fusion = RRFFusion(k=100)
         assert fusion.k == 100
     
     def test_k_must_be_positive_integer(self):
-        """Should reject non-positive k values."""
+        """Should reject non-positive k values. / 应拒绝非正 k 值。"""
         with pytest.raises(ValueError, match="positive integer"):
             RRFFusion(k=0)
         
@@ -99,7 +99,7 @@ class TestRRFFusionInit:
             RRFFusion(k=-10)
     
     def test_k_must_be_integer(self):
-        """Should reject non-integer k values."""
+        """Should reject non-integer k values. / 应拒绝非整数 k 值。"""
         with pytest.raises(ValueError, match="positive integer"):
             RRFFusion(k=60.5)
         
@@ -108,90 +108,90 @@ class TestRRFFusionInit:
 
 
 # =============================================================================
-# Basic Fusion Tests
+# Basic Fusion Tests / 基础融合测试
 # =============================================================================
 
 class TestRRFFusionBasic:
-    """Tests for basic RRF fusion functionality."""
+    """Tests for basic RRF fusion functionality. / 基础 RRF fusion 功能测试。"""
     
     def test_fuse_single_list(self, fusion_default, dense_results):
-        """Fusing a single list should preserve order with RRF scores."""
+        """Fusing a single list should preserve order with RRF scores. / 融合单个列表应保留顺序并使用 RRF 分数。"""
         fused = fusion_default.fuse([dense_results])
         
         assert len(fused) == 3
-        # Order should be preserved: a, b, c
+        # Order should be preserved: a, b, c / 顺序应保留：a、b、c
         assert [r.chunk_id for r in fused] == ["a", "b", "c"]
-        # Scores should be RRF scores: 1/(60+1), 1/(60+2), 1/(60+3)
+        # Scores should be RRF scores: 1/(60+1), 1/(60+2), 1/(60+3) / 分数应为 RRF 分数：1/(60+1)、1/(60+2)、1/(60+3)
         assert abs(fused[0].score - 1/61) < 1e-10
         assert abs(fused[1].score - 1/62) < 1e-10
         assert abs(fused[2].score - 1/63) < 1e-10
     
     def test_fuse_two_overlapping_lists(self, fusion_default, dense_results, sparse_results):
-        """Fusing overlapping lists should combine scores correctly."""
+        """Fusing overlapping lists should combine scores correctly. / 融合有重叠的列表应正确合并分数。"""
         fused = fusion_default.fuse([dense_results, sparse_results])
         
-        # Should have 4 unique chunks: a, b, c, d
+        # Should have 4 unique chunks: a, b, c, d / 应有 4 个唯一 chunk：a、b、c、d
         assert len(fused) == 4
         chunk_ids = {r.chunk_id for r in fused}
         assert chunk_ids == {"a", "b", "c", "d"}
         
-        # 'b' appears in both lists (rank 2 in dense, rank 1 in sparse)
-        # RRF(b) = 1/(60+2) + 1/(60+1) = 1/62 + 1/61
+        # 'b' appears in both lists (rank 2 in dense, rank 1 in sparse) / 'b' 同时出现在两个列表中（dense 中排名 2，sparse 中排名 1）
+        # RRF(b) = 1/(60+2) + 1/(60+1) = 1/62 + 1/61 / RRF(b) = 1/(60+2) + 1/(60+1) = 1/62 + 1/61
         b_result = next(r for r in fused if r.chunk_id == "b")
         expected_b_score = 1/62 + 1/61
         assert abs(b_result.score - expected_b_score) < 1e-10
         
-        # 'c' appears in both lists (rank 3 in dense, rank 2 in sparse)
-        # RRF(c) = 1/(60+3) + 1/(60+2) = 1/63 + 1/62
+        # 'c' appears in both lists (rank 3 in dense, rank 2 in sparse) / 'c' 同时出现在两个列表中（dense 中排名 3，sparse 中排名 2）
+        # RRF(c) = 1/(60+3) + 1/(60+2) = 1/63 + 1/62 / RRF(c) = 1/(60+3) + 1/(60+2) = 1/63 + 1/62
         c_result = next(r for r in fused if r.chunk_id == "c")
         expected_c_score = 1/63 + 1/62
         assert abs(c_result.score - expected_c_score) < 1e-10
         
-        # 'a' only in dense (rank 1)
-        # RRF(a) = 1/(60+1) = 1/61
+        # 'a' only in dense (rank 1) / 'a' 只在 dense 中（排名 1）
+        # RRF(a) = 1/(60+1) = 1/61 / RRF(a) = 1/(60+1) = 1/61
         a_result = next(r for r in fused if r.chunk_id == "a")
         assert abs(a_result.score - 1/61) < 1e-10
         
-        # 'd' only in sparse (rank 3)
-        # RRF(d) = 1/(60+3) = 1/63
+        # 'd' only in sparse (rank 3) / 'd' 只在 sparse 中（排名 3）
+        # RRF(d) = 1/(60+3) = 1/63 / RRF(d) = 1/(60+3) = 1/63
         d_result = next(r for r in fused if r.chunk_id == "d")
         assert abs(d_result.score - 1/63) < 1e-10
     
     def test_fuse_disjoint_lists(self, fusion_default, disjoint_results_1, disjoint_results_2):
-        """Fusing non-overlapping lists should include all documents."""
+        """Fusing non-overlapping lists should include all documents. / 融合无重叠列表应包含所有文档。"""
         fused = fusion_default.fuse([disjoint_results_1, disjoint_results_2])
         
         assert len(fused) == 4
         chunk_ids = {r.chunk_id for r in fused}
         assert chunk_ids == {"x", "y", "p", "q"}
         
-        # All should have single-list RRF scores
+        # All should have single-list RRF scores / 所有结果都应具有单列表 RRF 分数
         x_result = next(r for r in fused if r.chunk_id == "x")
-        assert abs(x_result.score - 1/61) < 1e-10  # rank 1 in list 1
+        assert abs(x_result.score - 1/61) < 1e-10  # rank 1 in list 1 / 在列表 1 中排名 1
     
     def test_fuse_with_top_k(self, fusion_default, dense_results, sparse_results):
-        """top_k should limit the number of returned results."""
+        """top_k should limit the number of returned results. / top_k 应限制返回结果数量。"""
         fused = fusion_default.fuse([dense_results, sparse_results], top_k=2)
         
         assert len(fused) == 2
-        # Should be the top 2 by RRF score
+        # Should be the top 2 by RRF score / 应为 RRF 分数最高的前 2 个
     
     def test_fuse_top_k_larger_than_results(self, fusion_default, dense_results):
-        """top_k larger than available results should return all."""
+        """top_k larger than available results should return all. / top_k 大于可用结果数时应返回全部。"""
         fused = fusion_default.fuse([dense_results], top_k=100)
         
         assert len(fused) == 3
 
 
 # =============================================================================
-# Deterministic Behavior Tests
+# Deterministic Behavior Tests / 确定性行为测试
 # =============================================================================
 
 class TestRRFFusionDeterministic:
-    """Tests for deterministic behavior (key requirement from spec)."""
+    """Tests for deterministic behavior (key requirement from spec). / 确定性行为测试（spec 中的关键要求）。"""
     
     def test_same_input_produces_same_output(self, fusion_default, dense_results, sparse_results):
-        """Same input should always produce identical output."""
+        """Same input should always produce identical output. / 相同输入应始终产生相同输出。"""
         fused1 = fusion_default.fuse([dense_results, sparse_results])
         fused2 = fusion_default.fuse([dense_results, sparse_results])
         
@@ -202,8 +202,8 @@ class TestRRFFusionDeterministic:
             assert r1.text == r2.text
     
     def test_tie_breaking_by_chunk_id(self, fusion_default):
-        """Equal RRF scores should be broken by chunk_id alphabetically."""
-        # Create results where two chunks will have identical RRF scores
+        """Equal RRF scores should be broken by chunk_id alphabetically. / 相同 RRF 分数应按 chunk_id 字母序打破平局。"""
+        # Create results where two chunks will have identical RRF scores / 创建两个 chunk 具有相同 RRF 分数的结果
         list1 = [
             RetrievalResult(chunk_id="zebra", score=0.9, text="Z", metadata={}),
         ]
@@ -213,12 +213,12 @@ class TestRRFFusionDeterministic:
         
         fused = fusion_default.fuse([list1, list2])
         
-        # Both have RRF score = 1/(60+1) = 1/61
-        assert fused[0].chunk_id == "apple"  # 'a' < 'z'
+        # Both have RRF score = 1/(60+1) = 1/61 / 二者 RRF 分数都是 1/(60+1) = 1/61
+        assert fused[0].chunk_id == "apple"  # 'a' < 'z' / 'a' < 'z'
         assert fused[1].chunk_id == "zebra"
     
     def test_list_order_affects_metadata_source(self, fusion_default):
-        """First occurrence's metadata should be preserved."""
+        """First occurrence's metadata should be preserved. / 应保留首次出现结果的 metadata。"""
         list1 = [
             RetrievalResult(chunk_id="shared", score=0.9, text="Text from list 1", metadata={"source": "list1"}),
         ]
@@ -229,20 +229,20 @@ class TestRRFFusionDeterministic:
         fused = fusion_default.fuse([list1, list2])
         
         assert len(fused) == 1
-        # First occurrence (list1) metadata preserved
+        # First occurrence (list1) metadata preserved / 保留首次出现（list1）的 metadata
         assert fused[0].metadata["source"] == "list1"
         assert fused[0].text == "Text from list 1"
     
     def test_order_of_lists_does_not_affect_scores(self, fusion_default, dense_results, sparse_results):
-        """Swapping list order should produce same scores (different order for ties only)."""
+        """Swapping list order should produce same scores (different order for ties only). / 交换列表顺序应产生相同分数（仅平局顺序可能不同）。"""
         fused1 = fusion_default.fuse([dense_results, sparse_results])
         fused2 = fusion_default.fuse([sparse_results, dense_results])
         
-        # Create score lookup
+        # Create score lookup / 创建分数查找表
         scores1 = {r.chunk_id: r.score for r in fused1}
         scores2 = {r.chunk_id: r.score for r in fused2}
         
-        # Scores should be identical
+        # Scores should be identical / 分数应相同
         assert scores1 == scores2
 
 

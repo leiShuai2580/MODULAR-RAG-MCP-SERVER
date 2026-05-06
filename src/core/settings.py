@@ -1,4 +1,4 @@
-"""Configuration loading and validation for the Modular RAG MCP Server."""
+"""Configuration loading and validation for the Modular RAG MCP Server. / Modular RAG MCP Server 的配置加载与校验。"""
 
 from __future__ import annotations
 
@@ -9,20 +9,20 @@ from typing import Any, Dict, List, Optional, Union
 import yaml
 
 # ---------------------------------------------------------------------------
-# Repo root & path resolution
+# Repo root & path resolution / 仓库根目录与路径解析
 # ---------------------------------------------------------------------------
-# Anchored to this file's location: <repo>/src/core/settings.py → parents[2]
+# Anchored to this file's location: <repo>/src/core/settings.py → parents[2] / 锚定到当前文件位置：<repo>/src/core/settings.py → parents[2]
 REPO_ROOT: Path = Path(__file__).resolve().parents[2]
 
-# Default absolute path to settings.yaml
+# Default absolute path to settings.yaml / settings.yaml 的默认绝对路径
 DEFAULT_SETTINGS_PATH: Path = REPO_ROOT / "config" / "settings.yaml"
 
 
 def resolve_path(relative: Union[str, Path]) -> Path:
-    """Resolve a repo-relative path to an absolute path.
+    """Resolve a repo-relative path to an absolute path. / 将仓库相对路径解析为绝对路径。
 
-    If *relative* is already absolute it is returned as-is.  Otherwise
-    it is resolved against :data:`REPO_ROOT`.
+    If *relative* is already absolute it is returned as-is.  Otherwise / 如果 *relative* 已经是绝对路径，则原样返回。否则
+    it is resolved against :data:`REPO_ROOT`. / 会基于 :data:`REPO_ROOT` 进行解析。
 
     >>> resolve_path("config/settings.yaml")  # doctest: +SKIP
     PosixPath('/home/user/Modular-RAG-MCP-Server/config/settings.yaml')
@@ -34,7 +34,7 @@ def resolve_path(relative: Union[str, Path]) -> Path:
 
 
 class SettingsError(ValueError):
-    """Raised when settings validation fails."""
+    """Raised when settings validation fails. / 配置校验失败时抛出。"""
 
 
 def _require_mapping(data: Dict[str, Any], key: str, path: str) -> Dict[str, Any]:
@@ -93,12 +93,12 @@ class LLMSettings:
     model: str
     temperature: float
     max_tokens: int
-    # Azure/OpenAI-specific optional fields
+    # Azure/OpenAI-specific optional fields / Azure/OpenAI 专用可选字段
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     azure_endpoint: Optional[str] = None
     deployment_name: Optional[str] = None
-    # Ollama-specific optional fields
+    # Ollama-specific optional fields / Ollama 专用可选字段
     base_url: Optional[str] = None
 
 
@@ -107,12 +107,12 @@ class EmbeddingSettings:
     provider: str
     model: str
     dimensions: int
-    # Azure-specific optional fields
+    # Azure-specific optional fields / Azure 专用可选字段
     api_key: Optional[str] = None
     api_version: Optional[str] = None
     azure_endpoint: Optional[str] = None
     deployment_name: Optional[str] = None
-    # Ollama-specific optional fields
+    # Ollama-specific optional fields / Ollama 专用可选字段
     base_url: Optional[str] = None
 
 
@@ -287,7 +287,7 @@ class Settings:
 
 
 def validate_settings(settings: Settings) -> None:
-    """Validate settings and raise SettingsError if invalid."""
+    """Validate settings and raise SettingsError if invalid. / 校验配置，如无效则抛出 SettingsError。"""
 
     if not settings.llm.provider:
         raise SettingsError("Missing required field: llm.provider")
@@ -306,11 +306,11 @@ def validate_settings(settings: Settings) -> None:
 
 
 def load_settings(path: str | Path | None = None) -> Settings:
-    """Load settings from a YAML file and validate required fields.
+    """Load settings from a YAML file and validate required fields. / 从 YAML 文件加载配置并校验必需字段。
 
-    Args:
-        path: Path to settings YAML.  Defaults to
-            ``<repo>/config/settings.yaml`` (absolute, CWD-independent).
+    Args: / 参数：
+        path: Path to settings YAML.  Defaults to / path：settings YAML 文件路径。默认值为
+            ``<repo>/config/settings.yaml`` (absolute, CWD-independent). / ``<repo>/config/settings.yaml``（绝对路径，与当前工作目录无关）。
     """
     settings_path = Path(path) if path is not None else DEFAULT_SETTINGS_PATH
     if not settings_path.is_absolute():

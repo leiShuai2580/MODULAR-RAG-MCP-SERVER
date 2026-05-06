@@ -1,14 +1,14 @@
-"""Unit tests for RagasEvaluator.
+"""Unit tests for RagasEvaluator. / RagasEvaluator 的单元测试。
 
-Tests verify:
-- Initialization with valid/invalid metrics
-- ImportError handling when ragas is not installed
-- Input validation (missing answer, empty query, etc.)
-- Metric extraction from settings
-- Text extraction from various chunk formats
+Tests verify: / 测试验证：
+- Initialization with valid/invalid metrics / 使用有效/无效指标初始化
+- ImportError handling when ragas is not installed / 未安装 ragas 时的 ImportError 处理
+- Input validation (missing answer, empty query, etc.) / 输入校验（缺失答案、空查询等）
+- Metric extraction from settings / 从 settings 提取指标
+- Text extraction from various chunk formats / 从多种 chunk 格式提取文本
 
-Note: Actual Ragas evaluation (LLM calls) is mocked to keep unit tests fast
-and deterministic.
+Note: Actual Ragas evaluation (LLM calls) is mocked to keep unit tests fast / 注意：真实 Ragas 评估（LLM 调用）已 mock，以保证单元测试快速
+and deterministic. / 且确定。
 """
 
 from __future__ import annotations
@@ -20,7 +20,7 @@ import pytest
 
 
 class TestRagasEvaluatorInit:
-    """Tests for RagasEvaluator initialisation."""
+    """Tests for RagasEvaluator initialisation. / RagasEvaluator 初始化测试。"""
 
     def test_init_default_metrics(self) -> None:
         from src.observability.evaluation.ragas_evaluator import RagasEvaluator
@@ -51,7 +51,7 @@ class TestRagasEvaluatorInit:
         settings.evaluation.metrics = ["faithfulness", "answer_relevancy", "hit_rate"]
 
         evaluator = RagasEvaluator(settings=settings)
-        # hit_rate is not a ragas metric, should be filtered out
+        # hit_rate is not a ragas metric, should be filtered out / hit_rate 不是 ragas 指标，应被过滤掉
         assert "hit_rate" not in evaluator._metric_names
         assert "faithfulness" in evaluator._metric_names
         assert "answer_relevancy" in evaluator._metric_names
@@ -64,7 +64,7 @@ class TestRagasEvaluatorInit:
 
 
 class TestRagasImportCheck:
-    """Tests for ragas import validation."""
+    """Tests for ragas import validation. / ragas 导入校验测试。"""
 
     def test_import_error_when_ragas_missing(self) -> None:
         from src.observability.evaluation.ragas_evaluator import _import_ragas
@@ -75,7 +75,7 @@ class TestRagasImportCheck:
 
 
 class TestRagasEvaluatorValidation:
-    """Tests for input validation in evaluate()."""
+    """Tests for input validation in evaluate(). / evaluate() 输入校验测试。"""
 
     def test_empty_query_raises(self) -> None:
         from src.observability.evaluation.ragas_evaluator import RagasEvaluator
@@ -107,7 +107,7 @@ class TestRagasEvaluatorValidation:
 
 
 class TestRagasEvaluatorTextExtraction:
-    """Tests for _extract_texts helper."""
+    """Tests for _extract_texts helper. / _extract_texts 辅助函数测试。"""
 
     def test_extract_from_dicts(self) -> None:
         from src.observability.evaluation.ragas_evaluator import RagasEvaluator
@@ -141,10 +141,10 @@ class TestRagasEvaluatorTextExtraction:
 
 
 class TestRagasEvaluatorEvaluate:
-    """Tests for evaluate() with mocked Ragas backend."""
+    """Tests for evaluate() with mocked Ragas backend. / 使用 mock Ragas backend 的 evaluate() 测试。"""
 
     def _make_mock_ragas_result(self, scores: Dict[str, float]) -> MagicMock:
-        """Create a mock ragas evaluation result."""
+        """Create a mock ragas evaluation result. / 创建 mock ragas 评估结果。"""
         import pandas as pd
 
         df = pd.DataFrame([scores])
@@ -201,7 +201,7 @@ class TestRagasEvaluatorEvaluate:
             )
 
     def test_ground_truth_is_ignored(self) -> None:
-        """Ragas should work fine even when ground_truth is provided."""
+        """Ragas should work fine even when ground_truth is provided. / 即使提供 ground_truth，Ragas 也应正常工作。"""
         from src.observability.evaluation.ragas_evaluator import RagasEvaluator
 
         evaluator = RagasEvaluator(metrics=["faithfulness"])
@@ -211,14 +211,14 @@ class TestRagasEvaluatorEvaluate:
             query="test",
             retrieved_chunks=[{"text": "ctx"}],
             generated_answer="answer",
-            ground_truth=["chunk_001"],  # should be ignored
+            ground_truth=["chunk_001"],  # should be ignored / 应被忽略
         )
 
         assert "faithfulness" in result
 
 
 class TestRagasEvaluatorFactory:
-    """Tests for factory integration."""
+    """Tests for factory integration. / factory 集成测试。"""
 
     def test_factory_creates_ragas_evaluator(self) -> None:
         from src.libs.evaluator.evaluator_factory import EvaluatorFactory
@@ -237,4 +237,4 @@ class TestRagasEvaluatorFactory:
 
         providers = EvaluatorFactory.list_providers()
         assert "custom" in providers
-        # ragas may be in _PROVIDERS after first create or in _LAZY_PROVIDERS
+        # ragas may be in _PROVIDERS after first create or in _LAZY_PROVIDERS / ragas 可能在首次创建后位于 _PROVIDERS，或位于 _LAZY_PROVIDERS

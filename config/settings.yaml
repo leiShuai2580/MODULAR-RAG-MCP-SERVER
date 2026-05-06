@@ -1,12 +1,12 @@
-# Modular RAG MCP Server - Configuration
-# This is the main configuration file for the MCP Server.
-# Edit this file to configure LLM, Embedding, VectorStore, and other services.
+# Modular RAG MCP Server - Configuration / Modular RAG MCP Server 配置
+# This is the main configuration file for the MCP Server. / 这是 MCP Server 的主配置文件。
+# Edit this file to configure LLM, Embedding, VectorStore, and other services. / 编辑该文件以配置 LLM、Embedding、VectorStore 和其他服务。
 
 # =============================================================================
-# LLM Configuration
+# LLM Configuration / LLM 配置
 # =============================================================================
 llm:
-  provider: "openai"  # Options: openai, azure, ollama, deepseek
+  provider: "openai"  # Options: openai, azure, ollama, deepseek / 可选项：openai、azure、ollama、deepseek
   model: "gpt-4o"
   deployment_name: "gpt-4o"
   azure_endpoint: "https://YOUR_ENDPOINT.openai.azure.com/"
@@ -16,97 +16,97 @@ llm:
   max_tokens: 4096
 
 # =============================================================================
-# Embedding Configuration
+# Embedding Configuration / Embedding 配置
 # =============================================================================
 embedding:
-  provider: "openai"  # Options: openai, azure, ollama
+  provider: "openai"  # Options: openai, azure, ollama / 可选项：openai、azure、ollama
   model: "text-embedding-ada-002"
   dimensions: 1536  # text-embedding-ada-002 固定维度 (不传递给API, 仅用于验证)
-  # Azure-compatible settings (azure_endpoint triggers Azure compat mode):
+  # Azure-compatible settings (azure_endpoint triggers Azure compat mode): / Azure 兼容设置（azure_endpoint 会触发 Azure 兼容模式）：
   azure_endpoint: "https://YOUR_ENDPOINT.openai.azure.com/"
   deployment_name: "text-embedding-ada-002"
   api_version: "2024-02-15-preview"
   api_key: "YOUR_API_KEY_HERE"
-  # OpenAI-specific settings (if provider is openai):
+  # OpenAI-specific settings (if provider is openai): / OpenAI 专用设置（如果 provider 为 openai）：
   # api_key: "YOUR_API_KEY_HERE"
 
 # =============================================================================
-# Vision LLM Configuration (for Image Captioning)
+# Vision LLM Configuration (for Image Captioning) / Vision LLM 配置（用于图片描述）
 # =============================================================================
 vision_llm:
-  enabled: true  # Set to true to enable vision capabilities
-  provider: "openai"  # Options: openai, azure, ollama
-  model: "gpt-4o"  # Options: gpt-4o, gpt-4-vision-preview (OpenAI), llava (Ollama)
-  # Azure-compatible settings (azure_endpoint triggers Azure compat mode):
+  enabled: true  # Set to true to enable vision capabilities / 设置为 true 以启用视觉能力
+  provider: "openai"  # Options: openai, azure, ollama / 可选项：openai、azure、ollama
+  model: "gpt-4o"  # Options: gpt-4o, gpt-4-vision-preview (OpenAI), llava (Ollama) / 可选项：gpt-4o、gpt-4-vision-preview（OpenAI）、llava（Ollama）
+  # Azure-compatible settings (azure_endpoint triggers Azure compat mode): / Azure 兼容设置（azure_endpoint 会触发 Azure 兼容模式）：
   azure_endpoint: "https://YOUR_ENDPOINT.openai.azure.com/"
   deployment_name: "gpt-4o"
   api_version: "2024-02-15-preview"
   api_key: "YOUR_API_KEY_HERE"
-  # Ollama-specific settings (if provider is ollama):
+  # Ollama-specific settings (if provider is ollama): / Ollama 专用设置（如果 provider 为 ollama）：
   # base_url: "http://localhost:11434"
-  max_image_size: 2048  # Max dimension (width/height) for image compression
+  max_image_size: 2048  # Max dimension (width/height) for image compression / 图片压缩的最大尺寸（宽/高）
 
 # =============================================================================
-# Vector Store Configuration
+# Vector Store Configuration / Vector Store 配置
 # =============================================================================
 vector_store:
-  provider: "chroma"  # Options: chroma, qdrant, pinecone
+  provider: "chroma"  # Options: chroma, qdrant, pinecone / 可选项：chroma、qdrant、pinecone
   persist_directory: "./data/db/chroma"
   collection_name: "knowledge_hub"
 
 # =============================================================================
-# Retrieval Configuration
+# Retrieval Configuration / Retrieval 配置
 # =============================================================================
 retrieval:
   dense_top_k: 20
   sparse_top_k: 20
   fusion_top_k: 10
-  rrf_k: 60  # RRF constant
+  rrf_k: 60  # RRF constant / RRF 常量
 
 # =============================================================================
-# Rerank Configuration
+# Rerank Configuration / Rerank 配置
 # =============================================================================
 rerank:
   enabled: false
-  provider: "none"  # Options: none, cross_encoder, llm
+  provider: "none"  # Options: none, cross_encoder, llm / 可选项：none、cross_encoder、llm
   model: "cross-encoder/ms-marco-MiniLM-L-6-v2"
   top_k: 5
 
 # =============================================================================
-# Evaluation Configuration
+# Evaluation Configuration / Evaluation 配置
 # =============================================================================
 evaluation:
   enabled: false
-  provider: "custom"  # Options: ragas, deepeval, custom
+  provider: "custom"  # Options: ragas, deepeval, custom / 可选项：ragas、deepeval、custom
   metrics:
     - "hit_rate"
     - "mrr"
     - "faithfulness"
 
 # =============================================================================
-# Observability Configuration
+# Observability Configuration / Observability 配置
 # =============================================================================
 observability:
-  log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR
+  log_level: "INFO"  # Options: DEBUG, INFO, WARNING, ERROR / 可选项：DEBUG、INFO、WARNING、ERROR
   trace_enabled: true
   trace_file: "./logs/traces.jsonl"
   structured_logging: true
 
 # =============================================================================
-# Ingestion Configuration
+# Ingestion Configuration / Ingestion 配置
 # =============================================================================
 ingestion:
   chunk_size: 1000
   chunk_overlap: 200
-  splitter: "recursive"  # Options: recursive, semantic, fixed_length
+  splitter: "recursive"  # Options: recursive, semantic, fixed_length / 可选项：recursive、semantic、fixed_length
   batch_size: 100
   
-  # Chunk Refiner Configuration (C5)
+  # Chunk Refiner Configuration (C5) / Chunk Refiner 配置（C5）
   chunk_refiner:
-    use_llm: true  # Set to true to enable LLM-based refinement (requires LLM config)
-    # When use_llm is false or LLM call fails, falls back to rule-based refinement
+    use_llm: true  # Set to true to enable LLM-based refinement (requires LLM config) / 设置为 true 以启用基于 LLM 的精炼（需要 LLM 配置）
+    # When use_llm is false or LLM call fails, falls back to rule-based refinement / 当 use_llm 为 false 或 LLM 调用失败时，回退到基于规则的精炼
   
-  # Metadata Enricher Configuration (C6)
+  # Metadata Enricher Configuration (C6) / Metadata Enricher 配置（C6）
   metadata_enricher:
-    use_llm: true  # Set to true to enable LLM-based enrichment (requires LLM config)
-    # When use_llm is false or LLM call fails, falls back to rule-based enrichment
+    use_llm: true  # Set to true to enable LLM-based enrichment (requires LLM config) / 设置为 true 以启用基于 LLM 的增强（需要 LLM 配置）
+    # When use_llm is false or LLM call fails, falls back to rule-based enrichment / 当 use_llm 为 false 或 LLM 调用失败时，回退到基于规则的增强

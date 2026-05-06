@@ -1,10 +1,10 @@
-"""Integration tests for F4 – ingestion pipeline trace instrumentation.
+"""Integration tests for F4 – ingestion pipeline trace instrumentation. / F4 摄入流水线 trace 插桩的集成测试。
 
-Verifies that IngestionPipeline.run() populates TraceContext with the
-expected stages (load/split/transform/embed/upsert) and timing data.
+Verifies that IngestionPipeline.run() populates TraceContext with the / 验证 IngestionPipeline.run() 会向 TraceContext 填充
+expected stages (load/split/transform/embed/upsert) and timing data. / 预期阶段（load/split/transform/embed/upsert）和耗时数据。
 
-We monkey-patch the heavy external components so the test runs without
-real Azure / ChromaDB / LLM dependencies.
+We monkey-patch the heavy external components so the test runs without / 我们 monkey-patch 较重的外部组件，使测试无需
+real Azure / ChromaDB / LLM dependencies. / 真实 Azure / ChromaDB / LLM 依赖即可运行。
 """
 
 import time
@@ -19,7 +19,7 @@ from src.core.trace.trace_context import TraceContext
 from src.core.types import Document, Chunk
 
 
-# ── Fake heavy components ────────────────────────────────────────────
+# ── Fake heavy components ──────────────────────────────────────────── / ── 假重组件 ───────────────────────────────────
 
 def _fake_document(path: str = "test.pdf") -> Document:
     return Document(
@@ -47,13 +47,13 @@ class FakeBatchResult:
 
 
 class FakePipeline:
-    """Mimics IngestionPipeline but with all heavy components replaced."""
+    """Mimics IngestionPipeline but with all heavy components replaced. / 模拟 IngestionPipeline，但替换所有重组件。"""
 
     def __init__(self):
         self.collection = "test_collection"
         self.force = False
 
-        # Mock each component
+        # Mock each component / Mock 每个组件
         self.integrity_checker = MagicMock()
         self.integrity_checker.compute_sha256.return_value = "abc123"
         self.integrity_checker.should_skip.return_value = False
@@ -85,19 +85,19 @@ class FakePipeline:
 
 
 def _run_fake_pipeline(trace: Optional[TraceContext] = None):
-    """Import the real run() logic but wire it to FakePipeline."""
+    """Import the real run() logic but wire it to FakePipeline. / 导入真实 run() 逻辑，但连接到 FakePipeline。"""
     from src.ingestion.pipeline import IngestionPipeline
 
     fp = FakePipeline()
-    # Borrow the real `run` method but bind it to our fake instance
+    # Borrow the real `run` method but bind it to our fake instance / 借用真实 `run` 方法，但绑定到假实例
     return IngestionPipeline.run(fp, "test.pdf", trace=trace)
 
 
-# ── Tests ────────────────────────────────────────────────────────────
+# ── Tests ──────────────────────────────────────────────────────────── / ── 测试 ───────────────────────────────────────
 
 
 class TestIngestionPipelineTrace:
-    """Verify IngestionPipeline.run() records the 5 required stages."""
+    """Verify IngestionPipeline.run() records the 5 required stages. / 验证 IngestionPipeline.run() 会记录 5 个必需阶段。"""
 
     def test_records_load_stage(self) -> None:
         trace = TraceContext(trace_type="ingestion")
@@ -153,19 +153,19 @@ class TestIngestionPipelineTrace:
         trace.finish()
         d = trace.to_dict()
         assert d["trace_type"] == "ingestion"
-        assert len(d["stages"]) >= 5  # load, split, transform, embed, upsert
+        assert len(d["stages"]) >= 5  # load, split, transform, embed, upsert / load、split、transform、embed、upsert
 
     def test_no_trace_no_crash(self) -> None:
-        """run() with trace=None must not raise."""
+        """run() with trace=None must not raise. / trace=None 时 run() 不应抛出异常。"""
         result = _run_fake_pipeline(trace=None)
         assert result.success
 
     def test_stage_ordering(self) -> None:
-        """Stages should appear in pipeline order."""
+        """Stages should appear in pipeline order. / 阶段应按流水线顺序出现。"""
         trace = TraceContext(trace_type="ingestion")
         _run_fake_pipeline(trace)
         stage_names = [s["stage"] for s in trace.stages]
         expected_order = ["load", "split", "transform", "embed", "upsert"]
-        # All expected stages present and in order
+        # All expected stages present and in order / 所有预期阶段都存在且顺序正确
         positions = [stage_names.index(s) for s in expected_order]
         assert positions == sorted(positions)

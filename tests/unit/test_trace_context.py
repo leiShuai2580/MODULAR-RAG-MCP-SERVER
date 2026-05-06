@@ -1,4 +1,4 @@
-"""Tests for TraceContext (enhanced) and TraceCollector."""
+"""Tests for TraceContext (enhanced) and TraceCollector. / TraceContext（增强版）和 TraceCollector 测试。"""
 
 import json
 import time
@@ -9,10 +9,10 @@ from src.core.trace.trace_context import TraceContext
 from src.core.trace.trace_collector import TraceCollector
 
 
-# ── TraceContext basics ──────────────────────────────────────────────
+# ── TraceContext basics / TraceContext 基础 ─────────────────────────
 
 class TestTraceContextInit:
-    """Verify constructor defaults and trace_type."""
+    """Verify constructor defaults and trace_type. / 验证构造函数默认值和 trace_type。"""
 
     def test_default_trace_type_is_query(self) -> None:
         tc = TraceContext()
@@ -24,12 +24,12 @@ class TestTraceContextInit:
 
     def test_trace_id_is_uuid(self) -> None:
         tc = TraceContext()
-        assert len(tc.trace_id) == 36  # UUID-4 length with dashes
+        assert len(tc.trace_id) == 36  # UUID-4 length with dashes / 带短横线的 UUID-4 长度
 
     def test_started_at_is_iso_string(self) -> None:
         tc = TraceContext()
         assert isinstance(tc.started_at, str)
-        assert "T" in tc.started_at  # ISO format
+        assert "T" in tc.started_at  # ISO format / ISO 格式
 
     def test_finished_at_initially_none(self) -> None:
         tc = TraceContext()
@@ -40,10 +40,10 @@ class TestTraceContextInit:
         assert tc.stages == []
 
 
-# ── record_stage ────────────────────────────────────────────────────
+# ── record_stage / record_stage ────────────────────────────────────
 
 class TestRecordStage:
-    """Verify stage recording and backward compatibility."""
+    """Verify stage recording and backward compatibility. / 验证阶段记录和向后兼容性。"""
 
     def test_record_stage_appends(self) -> None:
         tc = TraceContext()
@@ -78,10 +78,10 @@ class TestRecordStage:
         assert len(tc.stages) == 2
 
 
-# ── get_stage_data (backward-compat) ────────────────────────────────
+# ── get_stage_data (backward-compat) / get_stage_data（向后兼容） ───
 
 class TestGetStageData:
-    """Backward-compatible helper returns last-written data."""
+    """Backward-compatible helper returns last-written data. / 向后兼容的辅助函数返回最后写入的数据。"""
 
     def test_returns_data_for_known_stage(self) -> None:
         tc = TraceContext()
@@ -99,10 +99,10 @@ class TestGetStageData:
         assert tc.get_stage_data("x") == {"v": 2}
 
 
-# ── finish ──────────────────────────────────────────────────────────
+# ── finish / finish ────────────────────────────────────────────────
 
 class TestFinish:
-    """Lifecycle: finish() sets finished_at and freezes elapsed."""
+    """Lifecycle: finish() sets finished_at and freezes elapsed. / 生命周期：finish() 设置 finished_at 并冻结耗时。"""
 
     def test_finish_sets_finished_at(self) -> None:
         tc = TraceContext()
@@ -118,13 +118,13 @@ class TestFinish:
         e1 = tc.elapsed_ms()
         time.sleep(0.01)
         e2 = tc.elapsed_ms()
-        assert e1 == e2  # frozen after finish
+        assert e1 == e2  # frozen after finish / finish 后已冻结
 
 
-# ── elapsed_ms ──────────────────────────────────────────────────────
+# ── elapsed_ms / elapsed_ms ────────────────────────────────────────
 
 class TestElapsedMs:
-    """Timing helpers."""
+    """Timing helpers. / 计时辅助函数。"""
 
     def test_total_elapsed_positive(self) -> None:
         tc = TraceContext()
@@ -142,10 +142,10 @@ class TestElapsedMs:
             tc.elapsed_ms("no_such")
 
 
-# ── to_dict & JSON serialisation ────────────────────────────────────
+# ── to_dict & JSON serialisation / to_dict 与 JSON 序列化 ───────────
 
 class TestToDict:
-    """to_dict() produces a JSON-serialisable dict."""
+    """to_dict() produces a JSON-serialisable dict. / to_dict() 生成可 JSON 序列化的字典。"""
 
     def test_contains_required_keys(self) -> None:
         tc = TraceContext(trace_type="ingestion")
@@ -176,10 +176,10 @@ class TestToDict:
         assert isinstance(tc.to_dict()["total_elapsed_ms"], float)
 
 
-# ── TraceCollector ──────────────────────────────────────────────────
+# ── TraceCollector / TraceCollector ────────────────────────────────
 
 class TestTraceCollector:
-    """TraceCollector persists traces to JSON Lines file."""
+    """TraceCollector persists traces to JSON Lines file. / TraceCollector 将 trace 持久化到 JSON Lines 文件。"""
 
     def test_collect_creates_file(self, tmp_path) -> None:
         p = tmp_path / "traces.jsonl"
@@ -204,7 +204,7 @@ class TestTraceCollector:
             assert obj["trace_type"] == "query"
 
     def test_collect_auto_finishes(self, tmp_path) -> None:
-        """If finish() was not called, collect() calls it automatically."""
+        """If finish() was not called, collect() calls it automatically. / 如果未调用 finish()，collect() 会自动调用它。"""
         p = tmp_path / "traces.jsonl"
         collector = TraceCollector(traces_path=p)
         tc = TraceContext()

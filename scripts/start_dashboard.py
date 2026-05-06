@@ -1,6 +1,6 @@
-"""Convenience launcher for the Modular RAG Dashboard.
+"""Convenience launcher for the Modular RAG Dashboard. / Modular RAG Dashboard 的便捷启动器。
 
-Usage::
+Usage:: / 用法：
 
     python scripts/start_dashboard.py
     python scripts/start_dashboard.py --port 8502

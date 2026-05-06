@@ -1,15 +1,15 @@
-"""E2E smoke tests for the Streamlit Dashboard pages.
+"""E2E smoke tests for the Streamlit Dashboard pages. / Streamlit Dashboard 页面的 E2E 冒烟测试。
 
-Uses Streamlit's ``AppTest`` framework to render each page's ``render()``
-function in headless mode and verify that:
+Uses Streamlit's ``AppTest`` framework to render each page's ``render()`` / 使用 Streamlit 的 ``AppTest`` 框架以 headless 模式
+function in headless mode and verify that: / 渲染每个页面的 ``render()`` 函数，并验证：
 
-1. No Python exception is raised during render.
-2. Each page produces at least one expected UI element (header / info / metric).
+1. No Python exception is raised during render. / 渲染期间不会抛出 Python 异常。
+2. Each page produces at least one expected UI element (header / info / metric). / 每个页面至少产生一个预期 UI 元素（header / info / metric）。
 
-These tests do **not** require live data – they should pass on a fresh
-checkout where the vector store is empty.
+These tests do **not** require live data – they should pass on a fresh / 这些测试**不**需要实时数据，在向量存储为空的
+checkout where the vector store is empty. / 全新检出环境中也应通过。
 
-Usage::
+Usage:: / 用法：
 
     pytest tests/e2e/test_dashboard_smoke.py -v
 """
@@ -26,11 +26,11 @@ import pytest
 logger = logging.getLogger(__name__)
 
 
-# ── Helpers ───────────────────────────────────────────────────────────
+# ── Helpers ─────────────────────────────────────────────────────────── / ── 辅助方法 ───────────────────────────────────
 
 
 def _mock_settings() -> MagicMock:
-    """Return a minimal mock Settings that satisfies all dashboard pages."""
+    """Return a minimal mock Settings that satisfies all dashboard pages. / 返回满足所有 dashboard 页面需求的最小 mock Settings。"""
     s = MagicMock()
     s.llm.provider = "azure"
     s.llm.model = "gpt-4o"
@@ -72,7 +72,7 @@ def _mock_settings() -> MagicMock:
 
 
 def _collect_text(at: Any) -> str:
-    """Collect all rendered text from an AppTest run for assertion."""
+    """Collect all rendered text from an AppTest run for assertion. / 收集 AppTest 运行中渲染的所有文本用于断言。"""
     parts: List[str] = []
     for attr in ("markdown", "header", "subheader", "info", "error", "title", "text", "success", "warning"):
         for el in getattr(at, attr, []):
@@ -80,19 +80,19 @@ def _collect_text(at: Any) -> str:
     return "\n".join(parts)
 
 
-# ── Tests ─────────────────────────────────────────────────────────────
+# ── Tests ───────────────────────────────────────────────────────────── / ── 测试 ───────────────────────────────────────
 
 
 class TestDashboardSmoke:
-    """Smoke tests: each page renders without uncaught exceptions."""
+    """Smoke tests: each page renders without uncaught exceptions. / 冒烟测试：每个页面渲染时没有未捕获异常。"""
 
-    # ------------------------------------------------------------------
-    # 1. Overview page
-    # ------------------------------------------------------------------
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
+    # 1. Overview page / 1. Overview 页面
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
 
     @pytest.mark.e2e
     def test_overview_page_renders(self) -> None:
-        """Overview page loads and shows system overview header."""
+        """Overview page loads and shows system overview header. / Overview 页面加载并显示系统概览标题。"""
         from streamlit.testing.v1 import AppTest
 
         def page_script():
@@ -113,13 +113,13 @@ class TestDashboardSmoke:
         text = _collect_text(at)
         assert "overview" in text.lower() or "system" in text.lower()
 
-    # ------------------------------------------------------------------
-    # 2. Data Browser page
-    # ------------------------------------------------------------------
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
+    # 2. Data Browser page / 2. Data Browser 页面
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
 
     @pytest.mark.e2e
     def test_data_browser_page_renders(self) -> None:
-        """Data Browser page loads (may show 'no documents' info)."""
+        """Data Browser page loads (may show 'no documents' info). / Data Browser 页面可加载（可能显示 'no documents' 信息）。"""
         from streamlit.testing.v1 import AppTest
 
         mock_svc = MagicMock()
@@ -143,13 +143,13 @@ class TestDashboardSmoke:
         text = _collect_text(at)
         assert "data" in text.lower() or "browser" in text.lower() or "document" in text.lower()
 
-    # ------------------------------------------------------------------
-    # 3. Ingestion Manager page
-    # ------------------------------------------------------------------
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
+    # 3. Ingestion Manager page / 3. Ingestion Manager 页面
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
 
     @pytest.mark.e2e
     def test_ingestion_manager_page_renders(self) -> None:
-        """Ingestion Manager page loads without errors."""
+        """Ingestion Manager page loads without errors. / Ingestion Manager 页面无错误加载。"""
         from streamlit.testing.v1 import AppTest
 
         mock_svc = MagicMock()
@@ -171,13 +171,13 @@ class TestDashboardSmoke:
             f"Ingestion Manager page raised an exception: {at.exception}"
         )
 
-    # ------------------------------------------------------------------
-    # 4. Ingestion Traces page
-    # ------------------------------------------------------------------
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
+    # 4. Ingestion Traces page / 4. Ingestion Traces 页面
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
 
     @pytest.mark.e2e
     def test_ingestion_traces_page_renders(self) -> None:
-        """Ingestion Traces page loads (empty trace list is OK)."""
+        """Ingestion Traces page loads (empty trace list is OK). / Ingestion Traces 页面可加载（空 trace 列表也可以）。"""
         from streamlit.testing.v1 import AppTest
 
         mock_svc = MagicMock()
@@ -201,13 +201,13 @@ class TestDashboardSmoke:
         text = _collect_text(at)
         assert "trace" in text.lower() or "ingestion" in text.lower()
 
-    # ------------------------------------------------------------------
-    # 5. Query Traces page
-    # ------------------------------------------------------------------
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
+    # 5. Query Traces page / 5. Query Traces 页面
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
 
     @pytest.mark.e2e
     def test_query_traces_page_renders(self) -> None:
-        """Query Traces page loads (empty trace list is OK)."""
+        """Query Traces page loads (empty trace list is OK). / Query Traces 页面可加载（空 trace 列表也可以）。"""
         from streamlit.testing.v1 import AppTest
 
         mock_svc = MagicMock()
@@ -231,13 +231,13 @@ class TestDashboardSmoke:
         text = _collect_text(at)
         assert "query" in text.lower() or "trace" in text.lower()
 
-    # ------------------------------------------------------------------
-    # 6. Evaluation Panel page
-    # ------------------------------------------------------------------
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
+    # 6. Evaluation Panel page / 6. Evaluation Panel 页面
+    # ------------------------------------------------------------------ / ------------------------------------------------------------------
 
     @pytest.mark.e2e
     def test_evaluation_panel_page_renders(self) -> None:
-        """Evaluation Panel page loads without errors."""
+        """Evaluation Panel page loads without errors. / Evaluation Panel 页面无错误加载。"""
         from streamlit.testing.v1 import AppTest
 
         def page_script():

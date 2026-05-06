@@ -1,7 +1,7 @@
-"""Integration tests for F3 – query pipeline trace instrumentation.
+"""Integration tests for F3 – query pipeline trace instrumentation. / F3 查询流水线 trace 插桩的集成测试。
 
-Verifies that HybridSearch.search() and CoreReranker.rerank() populate
-TraceContext with the expected stages and timing data.
+Verifies that HybridSearch.search() and CoreReranker.rerank() populate / 验证 HybridSearch.search() 和 CoreReranker.rerank() 会向
+TraceContext with the expected stages and timing data. / TraceContext 填充预期阶段和耗时数据。
 """
 
 import pytest
@@ -17,7 +17,7 @@ from src.core.query_engine.hybrid_search import (
 from src.core.query_engine.reranker import CoreReranker, RerankConfig
 
 
-# ── Fake components ──────────────────────────────────────────────────
+# ── Fake components ────────────────────────────────────────────────── / ── 假组件 ─────────────────────────────────────
 
 
 class FakeDenseRetriever:
@@ -49,7 +49,7 @@ class FakeQueryProcessor:
 
 class FakeFusion:
     def fuse(self, *, ranking_lists, top_k, trace=None) -> List[RetrievalResult]:
-        # Simple dedup + merge
+        # Simple dedup + merge / 简单去重并合并
         seen, merged = set(), []
         for rl in ranking_lists:
             for r in rl:
@@ -60,7 +60,7 @@ class FakeFusion:
 
 
 class FakeBaseReranker:
-    """Minimal reranker that adds rerank_score."""
+    """Minimal reranker that adds rerank_score. / 添加 rerank_score 的最小 reranker。"""
 
     def rerank(self, *, query, candidates, trace=None, **kw):
         for i, c in enumerate(candidates):
@@ -68,11 +68,11 @@ class FakeBaseReranker:
         return candidates
 
 
-# ── HybridSearch trace tests ────────────────────────────────────────
+# ── HybridSearch trace tests ──────────────────────────────────────── / ── HybridSearch trace 测试 ───────────────────
 
 
 class TestHybridSearchTrace:
-    """Verify HybridSearch populates TraceContext with expected stages."""
+    """Verify HybridSearch populates TraceContext with expected stages. / 验证 HybridSearch 会向 TraceContext 填充预期阶段。"""
 
     def _build_engine(self) -> HybridSearch:
         return HybridSearch(
@@ -84,7 +84,7 @@ class TestHybridSearchTrace:
                 dense_top_k=5,
                 sparse_top_k=5,
                 fusion_top_k=5,
-                parallel_retrieval=False,  # deterministic ordering
+                parallel_retrieval=False,  # deterministic ordering / 确定性排序
             ),
         )
 
@@ -144,20 +144,20 @@ class TestHybridSearchTrace:
         trace.finish()
         d = trace.to_dict()
         assert d["trace_type"] == "query"
-        assert len(d["stages"]) >= 4  # qp, dense, sparse, fusion
+        assert len(d["stages"]) >= 4  # qp, dense, sparse, fusion / query processing、dense、sparse、fusion
 
     def test_no_trace_no_crash(self) -> None:
-        """search() with trace=None must not raise."""
+        """search() with trace=None must not raise. / trace=None 时 search() 不应抛出异常。"""
         engine = self._build_engine()
         results = engine.search("hello world", trace=None)
         assert isinstance(results, list)
 
 
-# ── CoreReranker trace tests ────────────────────────────────────────
+# ── CoreReranker trace tests ──────────────────────────────────────── / ── CoreReranker trace 测试 ───────────────────
 
 
 class TestCoreRerankerTrace:
-    """Verify CoreReranker.rerank() populates trace with rerank stage."""
+    """Verify CoreReranker.rerank() populates trace with rerank stage. / 验证 CoreReranker.rerank() 会向 trace 填充 rerank 阶段。"""
 
     def _build_reranker(self) -> CoreReranker:
         settings = MagicMock()
@@ -202,7 +202,7 @@ class TestCoreRerankerTrace:
         assert len(result.results) > 0
 
     def test_full_pipeline_trace(self) -> None:
-        """Combined: HybridSearch + Reranker should produce 5 stages."""
+        """Combined: HybridSearch + Reranker should produce 5 stages. / 组合测试：HybridSearch + Reranker 应产生 5 个阶段。"""
         engine = HybridSearch(
             query_processor=FakeQueryProcessor(),
             dense_retriever=FakeDenseRetriever(),

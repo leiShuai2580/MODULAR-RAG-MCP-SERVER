@@ -1,4 +1,4 @@
-"""Unit tests for CompositeEvaluator."""
+"""Unit tests for CompositeEvaluator. / CompositeEvaluator 的单元测试。"""
 
 from __future__ import annotations
 
@@ -12,7 +12,7 @@ from src.observability.evaluation.composite_evaluator import CompositeEvaluator
 
 
 class FakeEvaluatorA(BaseEvaluator):
-    """Fake evaluator returning fixed metrics."""
+    """Fake evaluator returning fixed metrics. / 返回固定指标的 fake evaluator。"""
 
     def evaluate(
         self,
@@ -27,7 +27,7 @@ class FakeEvaluatorA(BaseEvaluator):
 
 
 class FakeEvaluatorB(BaseEvaluator):
-    """Fake evaluator returning different metrics."""
+    """Fake evaluator returning different metrics. / 返回不同指标的 fake evaluator。"""
 
     def evaluate(
         self,
@@ -42,7 +42,7 @@ class FakeEvaluatorB(BaseEvaluator):
 
 
 class FailingEvaluator(BaseEvaluator):
-    """Evaluator that always raises."""
+    """Evaluator that always raises. / 总是抛出异常的 evaluator。"""
 
     def evaluate(
         self,
@@ -57,7 +57,7 @@ class FailingEvaluator(BaseEvaluator):
 
 
 class TestCompositeEvaluatorInit:
-    """Tests for CompositeEvaluator initialisation."""
+    """Tests for CompositeEvaluator initialisation. / CompositeEvaluator 初始化测试。"""
 
     def test_init_with_evaluators(self) -> None:
         composite = CompositeEvaluator(evaluators=[FakeEvaluatorA(), FakeEvaluatorB()])
@@ -73,7 +73,7 @@ class TestCompositeEvaluatorInit:
 
 
 class TestCompositeEvaluatorEvaluate:
-    """Tests for evaluate() method."""
+    """Tests for evaluate() method. / evaluate() 方法测试。"""
 
     def test_merge_metrics_from_two_evaluators(self) -> None:
         composite = CompositeEvaluator(evaluators=[FakeEvaluatorA(), FakeEvaluatorB()])
@@ -102,7 +102,7 @@ class TestCompositeEvaluatorEvaluate:
             retrieved_chunks=[{"id": "c1"}],
         )
 
-        # FakeEvaluatorA succeeded, FailingEvaluator silently failed
+        # FakeEvaluatorA succeeded, FailingEvaluator silently failed / FakeEvaluatorA 成功，FailingEvaluator 静默失败
         assert metrics == {"hit_rate": 1.0, "mrr": 0.5}
 
     def test_all_fail_raises_runtime_error(self) -> None:
@@ -112,7 +112,7 @@ class TestCompositeEvaluatorEvaluate:
             composite.evaluate(query="test", retrieved_chunks=[{"id": "c1"}])
 
     def test_duplicate_metric_key_last_wins(self) -> None:
-        """When two evaluators produce the same key, the later one wins."""
+        """When two evaluators produce the same key, the later one wins. / 当两个 evaluator 产生相同 key 时，后者胜出。"""
 
         class EvalOverride(BaseEvaluator):
             def evaluate(self, query, retrieved_chunks, **kwargs):
@@ -124,8 +124,8 @@ class TestCompositeEvaluatorEvaluate:
 
         metrics = composite.evaluate(query="test", retrieved_chunks=[{"id": "c1"}])
 
-        assert metrics["hit_rate"] == 0.99  # overridden
-        assert metrics["mrr"] == 0.5  # from FakeEvaluatorA
+        assert metrics["hit_rate"] == 0.99  # overridden / 已覆盖
+        assert metrics["mrr"] == 0.5  # from FakeEvaluatorA / 来自 FakeEvaluatorA
 
     def test_validate_empty_query_raises(self) -> None:
         composite = CompositeEvaluator(evaluators=[FakeEvaluatorA()])
@@ -141,7 +141,7 @@ class TestCompositeEvaluatorEvaluate:
 
 
 class TestCompositeEvaluatorFactory:
-    """Tests for factory integration."""
+    """Tests for factory integration. / factory 集成测试。"""
 
     def test_factory_creates_composite(self) -> None:
         from src.libs.evaluator.evaluator_factory import EvaluatorFactory

@@ -1,23 +1,23 @@
 #!/usr/bin/env python
-"""Query script for the Modular RAG MCP Server.
+"""Query script for the Modular RAG MCP Server. / Modular RAG MCP Server 的查询脚本。
 
-This script provides a command-line interface for querying the knowledge hub
-using HybridSearch (Dense + Sparse + RRF) with optional reranking.
+This script provides a command-line interface for querying the knowledge hub / 该脚本提供用于查询知识中枢的命令行接口，
+using HybridSearch (Dense + Sparse + RRF) with optional reranking. / 使用 HybridSearch（Dense + Sparse + RRF）并支持可选重排。
 
-Usage:
-    # Run a single query
+Usage: / 用法：
+    # Run a single query / 运行单个查询
     python scripts/query.py --query "Azure OpenAI 配置步骤" --collection technical_docs
 
-    # Verbose mode (show dense/sparse/fusion/rerank results)
+    # Verbose mode (show dense/sparse/fusion/rerank results) / 详细模式（显示 dense/sparse/fusion/rerank 结果）
     python scripts/query.py --query "RRF 是什么" --verbose
 
-    # Disable reranking
+    # Disable reranking / 禁用重排
     python scripts/query.py --query "RRF 是什么" --no-rerank
 
-Exit codes:
-    0 - Success
-    1 - Query failure
-    2 - Configuration error
+Exit codes: / 退出码：
+    0 - Success / 成功
+    1 - Query failure / 查询失败
+    2 - Configuration error / 配置错误
 """
 
 import argparse
@@ -25,18 +25,18 @@ import sys
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-# Ensure project root is on sys.path
+# Ensure project root is on sys.path / 确保项目根目录位于 sys.path
 _SCRIPT_DIR = Path(__file__).resolve().parent
 _REPO_ROOT = _SCRIPT_DIR.parent
 sys.path.insert(0, str(_REPO_ROOT))
 
-# Set UTF-8 encoding for Windows console
+# Set UTF-8 encoding for Windows console / 为 Windows 控制台设置 UTF-8 编码
 if sys.platform == "win32":
     import io
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8", errors="replace")
     sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding="utf-8", errors="replace")
 
-# Ensure project root is in path for imports
+# Ensure project root is in path for imports / 确保导入时项目根目录在路径中
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
@@ -56,7 +56,7 @@ logger = get_logger(__name__)
 
 
 def parse_args() -> argparse.Namespace:
-    """Parse command line arguments."""
+    """Parse command line arguments. / 解析命令行参数。"""
     parser = argparse.ArgumentParser(
         description="Query documents from the Modular RAG knowledge hub.",
         formatter_class=argparse.RawDescriptionHelpFormatter,
@@ -151,7 +151,7 @@ def _build_components(settings, collection: str):
         bm25_indexer=bm25_indexer,
         vector_store=vector_store,
     )
-    # Ensure sparse retriever queries the correct collection index
+    # Ensure sparse retriever queries the correct collection index / 确保 sparse retriever 查询正确的集合索引
     sparse_retriever.default_collection = collection
 
     query_processor = QueryProcessor()
@@ -217,7 +217,7 @@ def _run_query(
         print("[INFO] 未找到相关文档，请先运行 ingest.py 摄取数据。")
         return 0
 
-    # Optional reranking
+    # Optional reranking / 可选重排
     if use_rerank and reranker.is_enabled:
         try:
             rerank_result = reranker.rerank(query=query, results=results, top_k=top_k, trace=trace)
@@ -242,7 +242,7 @@ def _run_query(
 def main() -> int:
     args = parse_args()
 
-    # Load configuration
+    # Load configuration / 加载配置
     try:
         config_path = Path(args.config)
         if not config_path.exists():
@@ -267,7 +267,7 @@ def main() -> int:
 
     use_rerank = not args.no_rerank
 
-    # Single-query mode
+    # Single-query mode / 单查询模式
     return _run_query(
         hybrid_search=hybrid_search,
         reranker=reranker,

@@ -1,6 +1,6 @@
 """
-Generate a PDF for blogger introduction and notes overview.
-Contains personal introduction, notes description, and sample images.
+Generate a PDF for blogger introduction and notes overview. / 生成博主介绍和笔记概览 PDF。
+Contains personal introduction, notes description, and sample images. / 包含个人介绍、笔记说明和示例图片。
 """
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import A4
@@ -20,16 +20,16 @@ import os
 
 
 def register_chinese_font():
-    """Register a Chinese font for PDF generation."""
-    # Try to find a Chinese font on the system
+    """Register a Chinese font for PDF generation. / 为 PDF 生成注册中文字体。"""
+    # Try to find a Chinese font on the system / 尝试在系统中查找中文字体
     font_paths = [
-        # Windows fonts
+        # Windows fonts / Windows 字体
         "C:/Windows/Fonts/msyh.ttc",  # 微软雅黑
         "C:/Windows/Fonts/simsun.ttc",  # 宋体
         "C:/Windows/Fonts/simhei.ttf",  # 黑体
-        # Mac fonts
+        # Mac fonts / Mac 字体
         "/System/Library/Fonts/PingFang.ttc",
-        # Linux fonts
+        # Linux fonts / Linux 字体
         "/usr/share/fonts/truetype/wqy/wqy-microhei.ttc",
     ]
     
@@ -41,12 +41,12 @@ def register_chinese_font():
             except:
                 continue
     
-    # Fallback to Helvetica if no Chinese font found
+    # Fallback to Helvetica if no Chinese font found / 如果未找到中文字体，则回退到 Helvetica
     return 'Helvetica'
 
 
 def get_image_paths():
-    """Get paths for the external images."""
+    """Get paths for the external images. / 获取外部图片路径。"""
     script_dir = Path(__file__).parent
     sample_docs_dir = script_dir / "sample_documents"
     
@@ -57,12 +57,12 @@ def get_image_paths():
 
 
 def generate_blogger_intro_pdf(output_path):
-    """Generate a PDF document with blogger introduction."""
+    """Generate a PDF document with blogger introduction. / 生成包含博主介绍的 PDF 文档。"""
     
-    # Register Chinese font
+    # Register Chinese font / 注册中文字体
     chinese_font = register_chinese_font()
     
-    # Create the PDF document
+    # Create the PDF document / 创建 PDF 文档
     doc = SimpleDocTemplate(
         str(output_path),
         pagesize=A4,
@@ -72,13 +72,13 @@ def generate_blogger_intro_pdf(output_path):
         bottomMargin=30,
     )
     
-    # Container for the 'Flowable' objects
+    # Container for the 'Flowable' objects / 'Flowable' 对象容器
     elements = []
     
-    # Define styles
+    # Define styles / 定义样式
     styles = getSampleStyleSheet()
     
-    # Custom styles with Chinese font
+    # Custom styles with Chinese font / 使用中文字体的自定义样式
     title_style = ParagraphStyle(
         'CustomTitle',
         parent=styles['Heading1'],
@@ -253,21 +253,21 @@ def generate_blogger_intro_pdf(output_path):
     # ==================== 图片1：设计思路 ====================
     elements.append(Paragraph("图片1：设计思路", heading_style))
     
-    # Get image paths
+    # Get image paths / 获取图片路径
     image_paths = get_image_paths()
     
-    # Add design thinking image (use external image)
+    # Add design thinking image (use external image) / 添加设计思路图片（使用外部图片）
     design_img_path = image_paths['design_thinking']
     if design_img_path.exists():
-        # Calculate appropriate size while maintaining aspect ratio
+        # Calculate appropriate size while maintaining aspect ratio / 在保持宽高比的同时计算合适尺寸
         with PILImage.open(design_img_path) as pil_img:
             orig_width, orig_height = pil_img.size
-            # Max width is 6 inches, calculate height to maintain ratio
+            # Max width is 6 inches, calculate height to maintain ratio / 最大宽度为 6 英寸，计算高度以保持比例
             max_width = 6 * inch
             aspect_ratio = orig_height / orig_width
-            img_width = min(max_width, orig_width * 0.8)  # Scale down if needed
+            img_width = min(max_width, orig_width * 0.8)  # Scale down if needed / 必要时缩小
             img_height = img_width * aspect_ratio
-            # Cap max height
+            # Cap max height / 限制最大高度
             if img_height > 7 * inch:
                 img_height = 7 * inch
                 img_width = img_height / aspect_ratio
@@ -282,18 +282,18 @@ def generate_blogger_intro_pdf(output_path):
     # ==================== 图片2：项目介绍 ====================
     elements.append(Paragraph("图片2：项目介绍", heading_style))
     
-    # Add project intro image (use external image)
+    # Add project intro image (use external image) / 添加项目介绍图片（使用外部图片）
     project_img_path = image_paths['project_intro']
     if project_img_path.exists():
-        # Calculate appropriate size while maintaining aspect ratio
+        # Calculate appropriate size while maintaining aspect ratio / 在保持宽高比的同时计算合适尺寸
         with PILImage.open(project_img_path) as pil_img:
             orig_width, orig_height = pil_img.size
-            # Max width is 6 inches, calculate height to maintain ratio
+            # Max width is 6 inches, calculate height to maintain ratio / 最大宽度为 6 英寸，计算高度以保持比例
             max_width = 6 * inch
             aspect_ratio = orig_height / orig_width
-            img_width = min(max_width, orig_width * 0.8)  # Scale down if needed
+            img_width = min(max_width, orig_width * 0.8)  # Scale down if needed / 必要时缩小
             img_height = img_width * aspect_ratio
-            # Cap max height
+            # Cap max height / 限制最大高度
             if img_height > 7 * inch:
                 img_height = 7 * inch
                 img_width = img_height / aspect_ratio
@@ -303,20 +303,20 @@ def generate_blogger_intro_pdf(output_path):
     else:
         elements.append(Paragraph(f"[图片未找到: {project_img_path}]", body_style))
 
-    # Build the PDF
+    # Build the PDF / 构建 PDF
     doc.build(elements)
     print(f"PDF generated successfully: {output_path}")
 
 
 def main():
-    """Main function to generate the blogger intro PDF."""
-    # Get the output path
+    """Main function to generate the blogger intro PDF. / 生成博主介绍 PDF 的主函数。"""
+    # Get the output path / 获取输出路径
     output_dir = Path(__file__).parent / "sample_documents"
     output_dir.mkdir(exist_ok=True)
     
     output_path = output_dir / "blogger_intro.pdf"
     
-    # Generate the PDF
+    # Generate the PDF / 生成 PDF
     generate_blogger_intro_pdf(output_path)
 
 
