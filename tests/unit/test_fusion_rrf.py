@@ -247,32 +247,32 @@ class TestRRFFusionDeterministic:
 
 
 # =============================================================================
-# Edge Cases and Error Handling
+# Edge Cases and Error Handling / 边界情况和错误处理
 # =============================================================================
 
 class TestRRFFusionEdgeCases:
-    """Tests for edge cases and error handling."""
+    """Tests for edge cases and error handling. / 边界情况和错误处理测试。"""
     
     def test_empty_ranking_lists_raises_error(self, fusion_default):
-        """Empty ranking_lists should raise ValueError."""
+        """Empty ranking_lists should raise ValueError. / 空 ranking_lists 应抛出 ValueError。"""
         with pytest.raises(ValueError, match="cannot be empty"):
             fusion_default.fuse([])
     
     def test_all_empty_lists_returns_empty(self, fusion_default):
-        """All empty lists should return empty result."""
+        """All empty lists should return empty result. / 全部为空列表时应返回空结果。"""
         fused = fusion_default.fuse([[], []])
         
         assert fused == []
     
     def test_some_empty_lists_ignored(self, fusion_default, dense_results):
-        """Empty lists should be filtered out."""
+        """Empty lists should be filtered out. / 空列表应被过滤掉。"""
         fused = fusion_default.fuse([[], dense_results, []])
         
         assert len(fused) == 3
         assert [r.chunk_id for r in fused] == ["a", "b", "c"]
     
     def test_single_result_per_list(self, fusion_default):
-        """Should handle lists with single results."""
+        """Should handle lists with single results. / 应能处理只有单个结果的列表。"""
         list1 = [RetrievalResult(chunk_id="only", score=1.0, text="Solo", metadata={})]
         
         fused = fusion_default.fuse([list1])
@@ -281,7 +281,7 @@ class TestRRFFusionEdgeCases:
         assert fused[0].chunk_id == "only"
     
     def test_many_lists(self, fusion_default):
-        """Should handle many ranking lists."""
+        """Should handle many ranking lists. / 应能处理多个 ranking lists。"""
         lists = [
             [RetrievalResult(chunk_id=f"chunk_{i}", score=1.0, text=f"Text {i}", metadata={})]
             for i in range(10)
@@ -292,31 +292,31 @@ class TestRRFFusionEdgeCases:
         assert len(fused) == 10
     
     def test_metadata_is_copied_not_shared(self, fusion_default, dense_results):
-        """Metadata should be copied to avoid mutation issues."""
+        """Metadata should be copied to avoid mutation issues. / metadata 应被复制以避免修改问题。"""
         fused = fusion_default.fuse([dense_results])
         
-        # Modify fused metadata
+        # Modify fused metadata / 修改 fused metadata
         fused[0].metadata["modified"] = True
         
-        # Original should not be affected
+        # Original should not be affected / 原始数据不应受影响
         assert "modified" not in dense_results[0].metadata
 
 
 # =============================================================================
-# K Parameter Sensitivity Tests
+# K Parameter Sensitivity Tests / K 参数敏感性测试
 # =============================================================================
 
 class TestRRFFusionKParameter:
-    """Tests for k parameter effects on fusion."""
+    """Tests for k parameter effects on fusion. / k 参数对 fusion 影响的测试。"""
     
     def test_higher_k_reduces_score_differences(self):
-        """Higher k should reduce the difference between adjacent ranks."""
+        """Higher k should reduce the difference between adjacent ranks. / 更高的 k 应减小相邻排名之间的分数差。"""
         fusion_k20 = RRFFusion(k=20)
         fusion_k100 = RRFFusion(k=100)
         
-        # Score difference between rank 1 and rank 2
-        # k=20: 1/21 - 1/22 = 0.00216...
-        # k=100: 1/101 - 1/102 = 0.000097...
+        # Score difference between rank 1 and rank 2 / rank 1 和 rank 2 之间的分数差
+        # k=20: 1/21 - 1/22 = 0.00216... / k=20：1/21 - 1/22 = 0.00216...
+        # k=100: 1/101 - 1/102 = 0.000097... / k=100：1/101 - 1/102 = 0.000097...
         
         diff_k20 = 1/21 - 1/22
         diff_k100 = 1/101 - 1/102
@@ -324,10 +324,10 @@ class TestRRFFusionKParameter:
         assert diff_k20 > diff_k100
     
     def test_k_affects_final_ranking(self):
-        """Different k values can lead to different rankings in edge cases."""
-        # Construct a case where k matters:
-        # Document A: rank 1 in list 1, not in list 2
-        # Document B: rank 10 in list 1, rank 1 in list 2
+        """Different k values can lead to different rankings in edge cases. / 不同 k 值在边界情况下可能导致不同排名。"""
+        # Construct a case where k matters: / 构造一个 k 会产生影响的场景：
+        # Document A: rank 1 in list 1, not in list 2 / Document A：在列表 1 中排名 1，不在列表 2 中
+        # Document B: rank 10 in list 1, rank 1 in list 2 / Document B：在列表 1 中排名 10，在列表 2 中排名 1
         
         list1 = [
             RetrievalResult(chunk_id="a", score=1.0, text="A", metadata={}),
@@ -348,33 +348,33 @@ class TestRRFFusionKParameter:
         fused_k20 = fusion_k20.fuse([list1, list2])
         fused_k100 = fusion_k100.fuse([list1, list2])
         
-        # Get scores for a and b in each fusion
+        # Get scores for a and b in each fusion / 获取每次 fusion 中 a 和 b 的分数
         scores_k20 = {r.chunk_id: r.score for r in fused_k20}
         scores_k100 = {r.chunk_id: r.score for r in fused_k100}
         
-        # With k=20:
-        # A: 1/(20+1) = 1/21 ≈ 0.0476
-        # B: 1/(20+10) + 1/(20+1) = 1/30 + 1/21 ≈ 0.0810
-        # B > A
+        # With k=20: / 当 k=20：
+        # A: 1/(20+1) = 1/21 ≈ 0.0476 / A：1/(20+1) = 1/21 ≈ 0.0476
+        # B: 1/(20+10) + 1/(20+1) = 1/30 + 1/21 ≈ 0.0810 / B：1/(20+10) + 1/(20+1) = 1/30 + 1/21 ≈ 0.0810
+        # B > A / B > A
         
-        # With k=100:
-        # A: 1/(100+1) = 1/101 ≈ 0.0099
-        # B: 1/(100+10) + 1/(100+1) = 1/110 + 1/101 ≈ 0.0190
-        # B > A (but closer)
+        # With k=100: / 当 k=100：
+        # A: 1/(100+1) = 1/101 ≈ 0.0099 / A：1/(100+1) = 1/101 ≈ 0.0099
+        # B: 1/(100+10) + 1/(100+1) = 1/110 + 1/101 ≈ 0.0190 / B：1/(100+10) + 1/(100+1) = 1/110 + 1/101 ≈ 0.0190
+        # B > A (but closer) / B > A（但差距更小）
         
         assert scores_k20["b"] > scores_k20["a"]
         assert scores_k100["b"] > scores_k100["a"]
 
 
 # =============================================================================
-# Weighted Fusion Tests
+# Weighted Fusion Tests / 加权融合测试
 # =============================================================================
 
 class TestRRFFusionWeighted:
-    """Tests for weighted RRF fusion."""
+    """Tests for weighted RRF fusion. / 加权 RRF fusion 测试。"""
     
     def test_weighted_fusion_basic(self, fusion_default):
-        """Weighted fusion should multiply scores by weights."""
+        """Weighted fusion should multiply scores by weights. / 加权融合应将分数乘以权重。"""
         list1 = [
             RetrievalResult(chunk_id="a", score=1.0, text="A", metadata={}),
         ]
@@ -382,18 +382,18 @@ class TestRRFFusionWeighted:
             RetrievalResult(chunk_id="b", score=1.0, text="B", metadata={}),
         ]
         
-        # Give list1 double weight
+        # Give list1 double weight / 给 list1 双倍权重
         fused = fusion_default.fuse_with_weights([list1, list2], weights=[2.0, 1.0])
         
         scores = {r.chunk_id: r.score for r in fused}
         
-        # A: 2.0 * 1/(60+1) = 2/61
-        # B: 1.0 * 1/(60+1) = 1/61
+        # A: 2.0 * 1/(60+1) = 2/61 / A：2.0 * 1/(60+1) = 2/61
+        # B: 1.0 * 1/(60+1) = 1/61 / B：1.0 * 1/(60+1) = 1/61
         assert abs(scores["a"] - 2/61) < 1e-10
         assert abs(scores["b"] - 1/61) < 1e-10
     
     def test_weighted_fusion_default_uniform(self, fusion_default, dense_results):
-        """Without weights, should be same as regular fusion."""
+        """Without weights, should be same as regular fusion. / 无 weights 时应与常规 fusion 相同。"""
         fused_regular = fusion_default.fuse([dense_results])
         fused_weighted = fusion_default.fuse_with_weights([dense_results])
         
@@ -402,20 +402,20 @@ class TestRRFFusionWeighted:
             assert abs(r1.score - r2.score) < 1e-10
     
     def test_weighted_fusion_weight_length_mismatch(self, fusion_default, dense_results, sparse_results):
-        """Weight length must match ranking_lists length."""
+        """Weight length must match ranking_lists length. / weight 长度必须匹配 ranking_lists 长度。"""
         with pytest.raises(ValueError, match="must match"):
             fusion_default.fuse_with_weights(
                 [dense_results, sparse_results],
-                weights=[1.0]  # Only 1 weight for 2 lists
+                weights=[1.0]  # Only 1 weight for 2 lists / 2 个列表只有 1 个权重
             )
     
     def test_weighted_fusion_negative_weight_rejected(self, fusion_default, dense_results):
-        """Negative weights should be rejected."""
+        """Negative weights should be rejected. / 负权重应被拒绝。"""
         with pytest.raises(ValueError, match="non-negative"):
             fusion_default.fuse_with_weights([dense_results], weights=[-1.0])
     
     def test_weighted_fusion_zero_weight(self, fusion_default):
-        """Zero weight should effectively ignore that list."""
+        """Zero weight should effectively ignore that list. / 零权重应等效于忽略该列表。"""
         list1 = [
             RetrievalResult(chunk_id="a", score=1.0, text="A", metadata={}),
         ]
@@ -428,10 +428,10 @@ class TestRRFFusionWeighted:
         scores = {r.chunk_id: r.score for r in fused}
         
         assert abs(scores["a"] - 1/61) < 1e-10
-        assert abs(scores["b"] - 0.0) < 1e-10  # Zero contribution
+        assert abs(scores["b"] - 0.0) < 1e-10  # Zero contribution / 零贡献
     
     def test_weighted_fusion_with_top_k(self, fusion_default, dense_results, sparse_results):
-        """Weighted fusion should respect top_k."""
+        """Weighted fusion should respect top_k. / 加权融合应遵守 top_k。"""
         fused = fusion_default.fuse_with_weights(
             [dense_results, sparse_results],
             weights=[1.5, 1.0],
@@ -442,29 +442,29 @@ class TestRRFFusionWeighted:
 
 
 # =============================================================================
-# Utility Function Tests
+# Utility Function Tests / 工具函数测试
 # =============================================================================
 
 class TestRRFScoreFunction:
-    """Tests for the rrf_score utility function."""
+    """Tests for the rrf_score utility function. / rrf_score 工具函数测试。"""
     
     def test_rrf_score_rank_1(self):
-        """RRF score for rank 1 with default k."""
+        """RRF score for rank 1 with default k. / 使用默认 k 时 rank 1 的 RRF 分数。"""
         score = rrf_score(1)
         assert abs(score - 1/61) < 1e-10
     
     def test_rrf_score_rank_10(self):
-        """RRF score for rank 10 with default k."""
+        """RRF score for rank 10 with default k. / 使用默认 k 时 rank 10 的 RRF 分数。"""
         score = rrf_score(10)
         assert abs(score - 1/70) < 1e-10
     
     def test_rrf_score_custom_k(self):
-        """RRF score with custom k value."""
+        """RRF score with custom k value. / 使用自定义 k 值的 RRF 分数。"""
         score = rrf_score(1, k=20)
         assert abs(score - 1/21) < 1e-10
     
     def test_rrf_score_invalid_rank(self):
-        """Should reject invalid rank values."""
+        """Should reject invalid rank values. / 应拒绝无效 rank 值。"""
         with pytest.raises(ValueError, match="positive integer"):
             rrf_score(0)
         
@@ -475,7 +475,7 @@ class TestRRFScoreFunction:
             rrf_score(1.5)
     
     def test_rrf_score_invalid_k(self):
-        """Should reject invalid k values."""
+        """Should reject invalid k values. / 应拒绝无效 k 值。"""
         with pytest.raises(ValueError, match="positive integer"):
             rrf_score(1, k=0)
         
@@ -484,15 +484,15 @@ class TestRRFScoreFunction:
 
 
 # =============================================================================
-# Integration-like Tests
+# Integration-like Tests / 类集成测试
 # =============================================================================
 
 class TestRRFFusionRealisticScenarios:
-    """Tests simulating realistic retrieval scenarios."""
+    """Tests simulating realistic retrieval scenarios. / 模拟真实检索场景的测试。"""
     
     def test_typical_hybrid_search_scenario(self, fusion_default):
-        """Simulate typical Dense + Sparse hybrid search."""
-        # Dense retrieval: semantic matches
+        """Simulate typical Dense + Sparse hybrid search. / 模拟典型 Dense + Sparse 混合检索。"""
+        # Dense retrieval: semantic matches / Dense 检索：语义匹配
         dense = [
             RetrievalResult(chunk_id="semantic_1", score=0.92, text="Detailed explanation of RAG architecture", metadata={"type": "doc"}),
             RetrievalResult(chunk_id="semantic_2", score=0.88, text="How retrieval augmented generation works", metadata={"type": "doc"}),
@@ -500,7 +500,7 @@ class TestRRFFusionRealisticScenarios:
             RetrievalResult(chunk_id="semantic_3", score=0.80, text="Vector embeddings for document search", metadata={"type": "doc"}),
         ]
         
-        # Sparse retrieval: keyword matches for "RAG Azure"
+        # Sparse retrieval: keyword matches for "RAG Azure" / Sparse 检索："RAG Azure" 的关键词匹配
         sparse = [
             RetrievalResult(chunk_id="keyword_1", score=8.5, text="Azure RAG setup guide", metadata={"type": "guide"}),
             RetrievalResult(chunk_id="both_1", score=7.2, text="RAG implementation with Azure OpenAI", metadata={"type": "tutorial"}),
@@ -509,23 +509,23 @@ class TestRRFFusionRealisticScenarios:
         
         fused = fusion_default.fuse([dense, sparse], top_k=5)
         
-        # Verify overlap document "both_1" gets boosted
+        # Verify overlap document "both_1" gets boosted / 验证重叠文档 "both_1" 被提升
         both_1_result = next(r for r in fused if r.chunk_id == "both_1")
         semantic_1_result = next(r for r in fused if r.chunk_id == "semantic_1")
         
-        # both_1 should have higher RRF score than semantic_1
-        # both_1: 1/(60+3) + 1/(60+2) = 1/63 + 1/62 ≈ 0.0320
-        # semantic_1: 1/(60+1) = 1/61 ≈ 0.0164
+        # both_1 should have higher RRF score than semantic_1 / both_1 的 RRF 分数应高于 semantic_1
+        # both_1: 1/(60+3) + 1/(60+2) = 1/63 + 1/62 ≈ 0.0320 / both_1：1/(60+3) + 1/(60+2) = 1/63 + 1/62 ≈ 0.0320
+        # semantic_1: 1/(60+1) = 1/61 ≈ 0.0164 / semantic_1：1/(60+1) = 1/61 ≈ 0.0164
         assert both_1_result.score > semantic_1_result.score
     
     def test_sparse_dominant_scenario(self, fusion_default):
-        """Scenario where sparse retrieval should be trusted more."""
-        # Sparse has strong exact keyword matches
+        """Scenario where sparse retrieval should be trusted more. / sparse 检索应更被信任的场景。"""
+        # Sparse has strong exact keyword matches / Sparse 具有强精确关键词匹配
         sparse = [
             RetrievalResult(chunk_id="exact_match", score=15.0, text="配置 Azure OpenAI API 密钥", metadata={}),
         ]
         
-        # Dense has weak semantic matches
+        # Dense has weak semantic matches / Dense 具有较弱语义匹配
         dense = [
             RetrievalResult(chunk_id="weak_semantic_1", score=0.52, text="Cloud service configuration", metadata={}),
             RetrievalResult(chunk_id="weak_semantic_2", score=0.51, text="API integration patterns", metadata={}),
@@ -534,5 +534,5 @@ class TestRRFFusionRealisticScenarios:
         
         fused = fusion_default.fuse([dense, sparse])
         
-        # exact_match should be ranked first due to appearing in both
+        # exact_match should be ranked first due to appearing in both / exact_match 因同时出现在两路中应排名第一
         assert fused[0].chunk_id == "exact_match"

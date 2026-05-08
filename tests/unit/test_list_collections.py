@@ -1,7 +1,7 @@
-"""Unit tests for list_collections MCP tool.
+"""Unit tests for list_collections MCP tool. / list_collections MCP 工具的单元测试。
 
-This module tests the ListCollectionsTool class that provides
-collection listing capabilities through the MCP protocol.
+This module tests the ListCollectionsTool class that provides / 本模块测试 ListCollectionsTool 类，它通过
+collection listing capabilities through the MCP protocol. / MCP 协议提供 collection 列表能力。
 """
 
 import pytest
@@ -21,12 +21,12 @@ from src.mcp_server.tools.list_collections import (
 
 
 # =============================================================================
-# Test Fixtures
+# Test Fixtures / 测试 Fixture
 # =============================================================================
 
 @pytest.fixture
 def mock_settings() -> Mock:
-    """Create mock settings object."""
+    """Create mock settings object. / 创建 mock settings 对象。"""
     settings = Mock()
     settings.vector_store = Mock()
     settings.vector_store.persist_directory = "./data/db/chroma"
@@ -35,7 +35,7 @@ def mock_settings() -> Mock:
 
 @pytest.fixture
 def mock_config() -> ListCollectionsConfig:
-    """Create test configuration."""
+    """Create test configuration. / 创建测试配置。"""
     return ListCollectionsConfig(
         persist_directory="./test_data/chroma",
         include_stats_default=True,
@@ -44,19 +44,19 @@ def mock_config() -> ListCollectionsConfig:
 
 @pytest.fixture
 def tool_with_mock_settings(mock_settings: Mock) -> ListCollectionsTool:
-    """Create ListCollectionsTool with mock settings."""
+    """Create ListCollectionsTool with mock settings. / 使用 mock settings 创建 ListCollectionsTool。"""
     return ListCollectionsTool(settings=mock_settings)
 
 
 @pytest.fixture
 def tool_with_config(mock_config: ListCollectionsConfig) -> ListCollectionsTool:
-    """Create ListCollectionsTool with explicit config."""
+    """Create ListCollectionsTool with explicit config. / 使用显式 config 创建 ListCollectionsTool。"""
     return ListCollectionsTool(config=mock_config)
 
 
 @pytest.fixture
 def sample_collections() -> List[CollectionInfo]:
-    """Create sample collection info list."""
+    """Create sample collection info list. / 创建示例 collection info 列表。"""
     return [
         CollectionInfo(
             name="knowledge_hub",
@@ -77,14 +77,14 @@ def sample_collections() -> List[CollectionInfo]:
 
 
 # =============================================================================
-# CollectionInfo Tests
+# CollectionInfo Tests / CollectionInfo 测试
 # =============================================================================
 
 class TestCollectionInfo:
-    """Tests for CollectionInfo dataclass."""
+    """Tests for CollectionInfo dataclass. / CollectionInfo dataclass 测试。"""
     
     def test_basic_creation(self) -> None:
-        """Test basic CollectionInfo creation."""
+        """Test basic CollectionInfo creation. / 测试基础 CollectionInfo 创建。"""
         info = CollectionInfo(name="test_coll")
         
         assert info.name == "test_coll"
@@ -92,7 +92,7 @@ class TestCollectionInfo:
         assert info.metadata is None
     
     def test_creation_with_all_fields(self) -> None:
-        """Test CollectionInfo creation with all fields."""
+        """Test CollectionInfo creation with all fields. / 测试使用所有字段创建 CollectionInfo。"""
         info = CollectionInfo(
             name="documents",
             count=100,
@@ -104,7 +104,7 @@ class TestCollectionInfo:
         assert info.metadata == {"type": "pdf"}
     
     def test_to_dict_minimal(self) -> None:
-        """Test to_dict with minimal fields."""
+        """Test to_dict with minimal fields. / 测试最小字段的 to_dict。"""
         info = CollectionInfo(name="test")
         result = info.to_dict()
         
@@ -113,14 +113,14 @@ class TestCollectionInfo:
         assert "metadata" not in result
     
     def test_to_dict_with_count(self) -> None:
-        """Test to_dict with count."""
+        """Test to_dict with count. / 测试包含 count 的 to_dict。"""
         info = CollectionInfo(name="test", count=50)
         result = info.to_dict()
         
         assert result == {"name": "test", "count": 50}
     
     def test_to_dict_full(self) -> None:
-        """Test to_dict with all fields."""
+        """Test to_dict with all fields. / 测试包含所有字段的 to_dict。"""
         info = CollectionInfo(
             name="docs",
             count=25,
@@ -135,30 +135,30 @@ class TestCollectionInfo:
         }
     
     def test_to_dict_empty_metadata(self) -> None:
-        """Test to_dict with empty metadata dict."""
+        """Test to_dict with empty metadata dict. / 测试空 metadata dict 的 to_dict。"""
         info = CollectionInfo(name="test", metadata={})
         result = info.to_dict()
         
-        # Empty metadata should not be included
+        # Empty metadata should not be included / 空 metadata 不应包含在结果中
         assert result == {"name": "test"}
 
 
 # =============================================================================
-# ListCollectionsConfig Tests
+# ListCollectionsConfig Tests / ListCollectionsConfig 测试
 # =============================================================================
 
 class TestListCollectionsConfig:
-    """Tests for ListCollectionsConfig dataclass."""
+    """Tests for ListCollectionsConfig dataclass. / ListCollectionsConfig dataclass 测试。"""
     
     def test_default_values(self) -> None:
-        """Test default configuration values."""
+        """Test default configuration values. / 测试默认配置值。"""
         config = ListCollectionsConfig()
         
         assert config.persist_directory == "./data/db/chroma"
         assert config.include_stats_default is True
     
     def test_custom_values(self) -> None:
-        """Test custom configuration values."""
+        """Test custom configuration values. / 测试自定义配置值。"""
         config = ListCollectionsConfig(
             persist_directory="/custom/path",
             include_stats_default=False,
@@ -169,49 +169,49 @@ class TestListCollectionsConfig:
 
 
 # =============================================================================
-# ListCollectionsTool Initialization Tests
+# ListCollectionsTool Initialization Tests / ListCollectionsTool 初始化测试
 # =============================================================================
 
 class TestListCollectionsToolInit:
-    """Tests for ListCollectionsTool initialization."""
+    """Tests for ListCollectionsTool initialization. / ListCollectionsTool 初始化测试。"""
     
     def test_init_with_settings(self, mock_settings: Mock) -> None:
-        """Test initialization with settings."""
+        """Test initialization with settings. / 测试使用 settings 初始化。"""
         tool = ListCollectionsTool(settings=mock_settings)
         
         assert tool._settings == mock_settings
         assert tool._config is None
     
     def test_init_with_config(self, mock_config: ListCollectionsConfig) -> None:
-        """Test initialization with explicit config."""
+        """Test initialization with explicit config. / 测试使用显式 config 初始化。"""
         tool = ListCollectionsTool(config=mock_config)
         
         assert tool._settings is None
         assert tool._config == mock_config
     
     def test_init_no_args(self) -> None:
-        """Test initialization without arguments."""
+        """Test initialization without arguments. / 测试无参数初始化。"""
         tool = ListCollectionsTool()
         
         assert tool._settings is None
         assert tool._config is None
     
     def test_settings_lazy_load(self) -> None:
-        """Test that settings are loaded lazily."""
+        """Test that settings are loaded lazily. / 测试 settings 会被延迟加载。"""
         tool = ListCollectionsTool()
         
         with patch('src.core.settings.load_settings') as mock_load:
             mock_settings = Mock()
             mock_load.return_value = mock_settings
             
-            # Access settings property
+            # Access settings property / 访问 settings 属性
             result = tool.settings
             
             mock_load.assert_called_once()
             assert result == mock_settings
     
     def test_config_derived_from_settings(self, mock_settings: Mock) -> None:
-        """Test that config is derived from settings."""
+        """Test that config is derived from settings. / 测试 config 从 settings 派生。"""
         tool = ListCollectionsTool(settings=mock_settings)
         
         config = tool.config
@@ -219,8 +219,8 @@ class TestListCollectionsToolInit:
         assert config.persist_directory == "./data/db/chroma"
     
     def test_config_fallback_no_vector_store(self) -> None:
-        """Test config fallback when vector_store config missing."""
-        settings = Mock(spec=[])  # No vector_store attribute
+        """Test config fallback when vector_store config missing. / 测试 vector_store 配置缺失时 config fallback。"""
+        settings = Mock(spec=[])  # No vector_store attribute / 没有 vector_store 属性
         tool = ListCollectionsTool(settings=settings)
         
         config = tool.config
@@ -229,17 +229,17 @@ class TestListCollectionsToolInit:
 
 
 # =============================================================================
-# ListCollectionsTool ChromaDB Client Tests
+# ListCollectionsTool ChromaDB Client Tests / ListCollectionsTool ChromaDB Client 测试
 # =============================================================================
 
 class TestListCollectionsToolChromaClient:
-    """Tests for ChromaDB client management."""
+    """Tests for ChromaDB client management. / ChromaDB client 管理测试。"""
     
     def test_get_chroma_client_chromadb_not_installed(
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test error when chromadb is not installed."""
+        """Test error when chromadb is not installed. / 测试未安装 chromadb 时的错误。"""
         with patch.dict('sys.modules', {'chromadb': None}):
             with patch('builtins.__import__', side_effect=ImportError("No chromadb")):
                 with pytest.raises(ImportError) as exc_info:
@@ -256,8 +256,8 @@ class TestListCollectionsToolChromaClient:
         tool_with_config: ListCollectionsTool,
         tmp_path: Path,
     ) -> None:
-        """Test successful ChromaDB client creation."""
-        # Update config to use temp path
+        """Test successful ChromaDB client creation. / 测试成功创建 ChromaDB client。"""
+        # Update config to use temp path / 更新 config 使用临时路径
         tool_with_config._config = ListCollectionsConfig(
             persist_directory=str(tmp_path / "chroma")
         )
@@ -279,7 +279,7 @@ class TestListCollectionsToolChromaClient:
         tool_with_config: ListCollectionsTool,
         tmp_path: Path,
     ) -> None:
-        """Test that missing directory is created."""
+        """Test that missing directory is created. / 测试缺失目录会被创建。"""
         new_path = tmp_path / "new_chroma_dir"
         tool_with_config._config = ListCollectionsConfig(
             persist_directory=str(new_path)
@@ -300,7 +300,7 @@ class TestListCollectionsToolChromaClient:
         tool_with_config: ListCollectionsTool,
         tmp_path: Path,
     ) -> None:
-        """Test error handling when client init fails."""
+        """Test error handling when client init fails. / 测试 client 初始化失败时的错误处理。"""
         tool_with_config._config = ListCollectionsConfig(
             persist_directory=str(tmp_path)
         )
@@ -314,17 +314,17 @@ class TestListCollectionsToolChromaClient:
 
 
 # =============================================================================
-# ListCollectionsTool list_collections Method Tests
+# ListCollectionsTool list_collections Method Tests / ListCollectionsTool list_collections 方法测试
 # =============================================================================
 
 class TestListCollectionsMethod:
-    """Tests for list_collections method."""
+    """Tests for list_collections method. / list_collections 方法测试。"""
     
     def test_list_collections_empty(
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test listing when no collections exist."""
+        """Test listing when no collections exist. / 测试不存在 collections 时的列表行为。"""
         mock_client = Mock()
         mock_client.list_collections.return_value = []
         
@@ -337,7 +337,7 @@ class TestListCollectionsMethod:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test listing collections with statistics."""
+        """Test listing collections with statistics. / 测试带统计信息列出 collections。"""
         mock_coll1 = Mock()
         mock_coll1.name = "collection1"
         mock_coll1.metadata = {"type": "docs"}
@@ -365,7 +365,7 @@ class TestListCollectionsMethod:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test listing collections without statistics."""
+        """Test listing collections without statistics. / 测试不带统计信息列出 collections。"""
         mock_coll = Mock()
         mock_coll.name = "test"
         mock_coll.metadata = None
@@ -378,14 +378,14 @@ class TestListCollectionsMethod:
         
         assert len(result) == 1
         assert result[0].name == "test"
-        assert result[0].count is None  # Not fetched
+        assert result[0].count is None  # Not fetched / 未获取
         mock_coll.count.assert_not_called()
     
     def test_list_collections_count_error_graceful(
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test graceful handling when count() fails."""
+        """Test graceful handling when count() fails. / 测试 count() 失败时的优雅处理。"""
         mock_coll = Mock()
         mock_coll.name = "problematic"
         mock_coll.metadata = {}
@@ -397,7 +397,7 @@ class TestListCollectionsMethod:
         with patch.object(tool_with_config, '_get_chroma_client', return_value=mock_client):
             result = tool_with_config.list_collections(include_stats=True)
         
-        # Should still return collection, but with None count
+        # Should still return collection, but with None count / 仍应返回 collection，但 count 为 None
         assert len(result) == 1
         assert result[0].name == "problematic"
         assert result[0].count is None
@@ -406,7 +406,7 @@ class TestListCollectionsMethod:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test error handling when client fails."""
+        """Test error handling when client fails. / 测试 client 失败时的错误处理。"""
         with patch.object(
             tool_with_config,
             '_get_chroma_client',
@@ -420,7 +420,7 @@ class TestListCollectionsMethod:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test error handling when list_collections fails."""
+        """Test error handling when list_collections fails. / 测试 list_collections 失败时的错误处理。"""
         mock_client = Mock()
         mock_client.list_collections.side_effect = Exception("List failed")
         
@@ -431,17 +431,17 @@ class TestListCollectionsMethod:
 
 
 # =============================================================================
-# ListCollectionsTool format_response Method Tests
+# ListCollectionsTool format_response Method Tests / ListCollectionsTool format_response 方法测试
 # =============================================================================
 
 class TestFormatResponse:
-    """Tests for format_response method."""
+    """Tests for format_response method. / format_response 方法测试。"""
     
     def test_format_empty_collections(
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test formatting empty collection list."""
+        """Test formatting empty collection list. / 测试格式化空 collection 列表。"""
         result = tool_with_config.format_response([])
         
         assert result == "No collections found in the knowledge base."
@@ -450,7 +450,7 @@ class TestFormatResponse:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test formatting single collection."""
+        """Test formatting single collection. / 测试格式化单个 collection。"""
         collections = [CollectionInfo(name="docs", count=50)]
         result = tool_with_config.format_response(collections)
         
@@ -462,7 +462,7 @@ class TestFormatResponse:
         tool_with_config: ListCollectionsTool,
         sample_collections: List[CollectionInfo]
     ) -> None:
-        """Test formatting multiple collections."""
+        """Test formatting multiple collections. / 测试格式化多个 collections。"""
         result = tool_with_config.format_response(sample_collections)
         
         assert "## Available Collections (3 total)" in result
@@ -474,7 +474,7 @@ class TestFormatResponse:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test formatting with user metadata."""
+        """Test formatting with user metadata. / 测试带用户 metadata 的格式化。"""
         collections = [
             CollectionInfo(
                 name="research",
@@ -493,7 +493,7 @@ class TestFormatResponse:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test that internal metadata is filtered out."""
+        """Test that internal metadata is filtered out. / 测试内部 metadata 会被过滤掉。"""
         collections = [
             CollectionInfo(
                 name="test",
@@ -507,30 +507,30 @@ class TestFormatResponse:
         ]
         result = tool_with_config.format_response(collections)
         
-        # Internal metadata should be filtered
+        # Internal metadata should be filtered / 内部 metadata 应被过滤
         assert "hnsw:space" not in result
         assert "_internal" not in result
-        # User metadata should be visible
+        # User metadata should be visible / 用户 metadata 应可见
         assert "user_field=visible" in result
     
     def test_format_without_count(
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test formatting when count is None."""
+        """Test formatting when count is None. / 测试 count 为 None 时的格式化。"""
         collections = [CollectionInfo(name="no_count")]
         result = tool_with_config.format_response(collections)
         
         assert "1. **no_count**" in result
-        assert "documents" not in result  # No count shown
+        assert "documents" not in result  # No count shown / 不显示计数
 
 
 # =============================================================================
-# ListCollectionsTool execute Method Tests
+# ListCollectionsTool execute Method Tests / ListCollectionsTool execute 方法测试
 # =============================================================================
 
 class TestExecuteMethod:
-    """Tests for async execute method."""
+    """Tests for async execute method. / 异步 execute 方法测试。"""
     
     @pytest.mark.asyncio
     async def test_execute_success(
@@ -538,7 +538,7 @@ class TestExecuteMethod:
         tool_with_config: ListCollectionsTool,
         sample_collections: List[CollectionInfo]
     ) -> None:
-        """Test successful execution."""
+        """Test successful execution. / 测试成功执行。"""
         with patch.object(
             tool_with_config,
             'list_collections',
@@ -556,7 +556,7 @@ class TestExecuteMethod:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test execution with no collections."""
+        """Test execution with no collections. / 测试无 collections 时执行。"""
         with patch.object(tool_with_config, 'list_collections', return_value=[]):
             result = await tool_with_config.execute()
         
@@ -568,7 +568,7 @@ class TestExecuteMethod:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test execution error handling."""
+        """Test execution error handling. / 测试执行错误处理。"""
         with patch.object(
             tool_with_config,
             'list_collections',
@@ -584,7 +584,7 @@ class TestExecuteMethod:
         self,
         tool_with_config: ListCollectionsTool
     ) -> None:
-        """Test that include_stats is passed correctly."""
+        """Test that include_stats is passed correctly. / 测试 include_stats 被正确传递。"""
         mock_list = Mock(return_value=[])
         
         with patch.object(tool_with_config, 'list_collections', mock_list):
@@ -594,14 +594,14 @@ class TestExecuteMethod:
 
 
 # =============================================================================
-# register_tool Function Tests
+# register_tool Function Tests / register_tool 函数测试
 # =============================================================================
 
 class TestRegisterTool:
-    """Tests for register_tool function."""
+    """Tests for register_tool function. / register_tool 函数测试。"""
     
     def test_register_tool_success(self) -> None:
-        """Test successful tool registration."""
+        """Test successful tool registration. / 测试成功注册工具。"""
         mock_handler = Mock()
         
         register_tool(mock_handler)
@@ -616,15 +616,15 @@ class TestRegisterTool:
     
     @pytest.mark.asyncio
     async def test_registered_handler_callable(self) -> None:
-        """Test that registered handler is callable."""
+        """Test that registered handler is callable. / 测试已注册 handler 可调用。"""
         mock_handler = Mock()
         
         register_tool(mock_handler)
         
-        # Get the registered handler
+        # Get the registered handler / 获取已注册 handler
         handler = mock_handler.register_tool.call_args.kwargs['handler']
         
-        # Mock the tool's execute method
+        # Mock the tool's execute method / Mock 工具的 execute 方法
         with patch.object(
             ListCollectionsTool,
             'execute',
@@ -635,34 +635,34 @@ class TestRegisterTool:
             
             result = await handler(include_stats=True)
             
-            # Handler should have been called
+            # Handler should have been called / handler 应已被调用
             assert result == mock_result
 
 
 # =============================================================================
-# Tool Metadata Tests
+# Tool Metadata Tests / 工具元数据测试
 # =============================================================================
 
 class TestToolMetadata:
-    """Tests for tool metadata constants."""
+    """Tests for tool metadata constants. / 工具元数据常量测试。"""
     
     def test_tool_name(self) -> None:
-        """Test tool name constant."""
+        """Test tool name constant. / 测试工具名称常量。"""
         assert TOOL_NAME == "list_collections"
     
     def test_tool_description_content(self) -> None:
-        """Test tool description contains key info."""
+        """Test tool description contains key info. / 测试工具描述包含关键信息。"""
         assert "collection" in TOOL_DESCRIPTION.lower()
         assert "knowledge base" in TOOL_DESCRIPTION.lower()
     
     def test_input_schema_structure(self) -> None:
-        """Test input schema has correct structure."""
+        """Test input schema has correct structure. / 测试 input schema 结构正确。"""
         assert TOOL_INPUT_SCHEMA["type"] == "object"
         assert "properties" in TOOL_INPUT_SCHEMA
         assert "include_stats" in TOOL_INPUT_SCHEMA["properties"]
     
     def test_input_schema_include_stats(self) -> None:
-        """Test include_stats property schema."""
+        """Test include_stats property schema. / 测试 include_stats 属性 schema。"""
         prop = TOOL_INPUT_SCHEMA["properties"]["include_stats"]
         
         assert prop["type"] == "boolean"
@@ -670,5 +670,5 @@ class TestToolMetadata:
         assert "description" in prop
     
     def test_no_required_params(self) -> None:
-        """Test that no parameters are required."""
+        """Test that no parameters are required. / 测试没有必需参数。"""
         assert TOOL_INPUT_SCHEMA["required"] == []

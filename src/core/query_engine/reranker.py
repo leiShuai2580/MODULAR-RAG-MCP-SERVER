@@ -205,7 +205,7 @@ class CoreReranker:
         for candidate in candidates:
             chunk_id = candidate["id"]
             
-            # Get original result or build new one
+            # Get original result or build new one / 获取原始结果或构建新结果
             if chunk_id in id_to_original:
                 original = id_to_original[chunk_id]
                 # Create new result with updated score / 使用更新后的分数创建新结果

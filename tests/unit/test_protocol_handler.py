@@ -1,10 +1,10 @@
-"""Unit tests for MCP Protocol Handler.
+"""Unit tests for MCP Protocol Handler. / MCP Protocol Handler 的单元测试。
 
-Tests cover:
-- Tool registration and schema generation
-- Tool execution with various return types
-- Error handling (invalid params, internal errors, unknown tools)
-- JSON-RPC error codes compliance
+Tests cover: / 测试覆盖：
+- Tool registration and schema generation / 工具注册与 schema 生成
+- Tool execution with various return types / 多种返回类型下的工具执行
+- Error handling (invalid params, internal errors, unknown tools) / 错误处理（无效参数、内部错误、未知工具）
+- JSON-RPC error codes compliance / JSON-RPC 错误码合规性
 """
 
 from __future__ import annotations
@@ -25,13 +25,13 @@ from src.mcp_server.protocol_handler import (
 
 
 # ============================================================================
-# Fixtures
+# Fixtures / Fixture
 # ============================================================================
 
 
 @pytest.fixture
 def protocol_handler() -> ProtocolHandler:
-    """Create a fresh ProtocolHandler instance."""
+    """Create a fresh ProtocolHandler instance. / 创建全新的 ProtocolHandler 实例。"""
     return ProtocolHandler(
         server_name="test-server",
         server_version="1.0.0",
@@ -40,7 +40,7 @@ def protocol_handler() -> ProtocolHandler:
 
 @pytest.fixture
 def sample_tool_schema() -> Dict[str, Any]:
-    """Sample JSON schema for a tool's input."""
+    """Sample JSON schema for a tool's input. / 工具输入的示例 JSON schema。"""
     return {
         "type": "object",
         "properties": {
@@ -52,15 +52,15 @@ def sample_tool_schema() -> Dict[str, Any]:
 
 
 # ============================================================================
-# ToolDefinition Tests
+# ToolDefinition Tests / ToolDefinition 测试
 # ============================================================================
 
 
 class TestToolDefinition:
-    """Tests for ToolDefinition dataclass."""
+    """Tests for ToolDefinition dataclass. / ToolDefinition dataclass 测试。"""
 
     def test_create_tool_definition(self, sample_tool_schema: Dict[str, Any]) -> None:
-        """Should create a ToolDefinition with all required fields."""
+        """Should create a ToolDefinition with all required fields. / 应创建包含所有必需字段的 ToolDefinition。"""
 
         async def dummy_handler(**kwargs: Any) -> str:
             return "result"
@@ -79,17 +79,17 @@ class TestToolDefinition:
 
 
 # ============================================================================
-# ProtocolHandler - Tool Registration Tests
+# ProtocolHandler - Tool Registration Tests / ProtocolHandler - 工具注册测试
 # ============================================================================
 
 
 class TestToolRegistration:
-    """Tests for tool registration functionality."""
+    """Tests for tool registration functionality. / 工具注册功能测试。"""
 
     def test_register_tool_success(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should successfully register a tool."""
+        """Should successfully register a tool. / 应成功注册工具。"""
 
         async def handler(**kwargs: Any) -> str:
             return "result"
@@ -108,7 +108,7 @@ class TestToolRegistration:
     def test_register_duplicate_tool_raises_error(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should raise ValueError when registering duplicate tool name."""
+        """Should raise ValueError when registering duplicate tool name. / 注册重复工具名称时应抛出 ValueError。"""
 
         async def handler(**kwargs: Any) -> str:
             return "result"
@@ -131,7 +131,7 @@ class TestToolRegistration:
     def test_register_multiple_tools(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should register multiple different tools."""
+        """Should register multiple different tools. / 应注册多个不同工具。"""
 
         async def handler1(**kwargs: Any) -> str:
             return "result1"
@@ -158,24 +158,24 @@ class TestToolRegistration:
 
 
 # ============================================================================
-# ProtocolHandler - Tool Schema Tests
+# ProtocolHandler - Tool Schema Tests / ProtocolHandler - 工具 Schema 测试
 # ============================================================================
 
 
 class TestGetToolSchemas:
-    """Tests for get_tool_schemas method."""
+    """Tests for get_tool_schemas method. / get_tool_schemas 方法测试。"""
 
     def test_empty_tools_returns_empty_list(
         self, protocol_handler: ProtocolHandler
     ) -> None:
-        """Should return empty list when no tools registered."""
+        """Should return empty list when no tools registered. / 未注册工具时应返回空列表。"""
         schemas = protocol_handler.get_tool_schemas()
         assert schemas == []
 
     def test_returns_tool_schemas(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should return list of Tool objects with correct schema."""
+        """Should return list of Tool objects with correct schema. / 应返回带正确 schema 的 Tool 对象列表。"""
 
         async def handler(**kwargs: Any) -> str:
             return "result"
@@ -197,18 +197,18 @@ class TestGetToolSchemas:
 
 
 # ============================================================================
-# ProtocolHandler - Tool Execution Tests
+# ProtocolHandler - Tool Execution Tests / ProtocolHandler - 工具执行测试
 # ============================================================================
 
 
 class TestExecuteTool:
-    """Tests for tool execution functionality."""
+    """Tests for tool execution functionality. / 工具执行功能测试。"""
 
     @pytest.mark.asyncio
     async def test_execute_tool_returns_string(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should wrap string return in CallToolResult."""
+        """Should wrap string return in CallToolResult. / 应将字符串返回值包装为 CallToolResult。"""
 
         async def handler(query: str, top_k: int = 5) -> str:
             return f"Found {top_k} results for: {query}"
@@ -234,7 +234,7 @@ class TestExecuteTool:
     async def test_execute_tool_returns_call_tool_result(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should pass through CallToolResult directly."""
+        """Should pass through CallToolResult directly. / 应直接透传 CallToolResult。"""
 
         async def handler(query: str, top_k: int = 5) -> types.CallToolResult:
             return types.CallToolResult(
@@ -258,7 +258,7 @@ class TestExecuteTool:
     async def test_execute_tool_returns_content_list(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should wrap content list in CallToolResult."""
+        """Should wrap content list in CallToolResult. / 应将 content list 包装为 CallToolResult。"""
 
         async def handler(query: str, top_k: int = 5) -> List[types.TextContent]:
             return [
@@ -283,7 +283,7 @@ class TestExecuteTool:
     async def test_execute_unknown_tool_returns_error(
         self, protocol_handler: ProtocolHandler
     ) -> None:
-        """Should return error result for unknown tool."""
+        """Should return error result for unknown tool. / 对未知工具应返回错误结果。"""
         result = await protocol_handler.execute_tool(
             "nonexistent_tool", {"arg": "value"}
         )
@@ -296,7 +296,7 @@ class TestExecuteTool:
     async def test_execute_tool_with_invalid_params(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should return error for invalid parameters."""
+        """Should return error for invalid parameters. / 对无效参数应返回错误。"""
 
         async def handler(query: str, top_k: int = 5) -> str:
             return f"Results for {query}"
@@ -308,7 +308,7 @@ class TestExecuteTool:
             handler=handler,
         )
 
-        # Call with unexpected keyword argument
+        # Call with unexpected keyword argument / 使用非预期 keyword 参数调用
         result = await protocol_handler.execute_tool(
             "search", {"query": "test", "invalid_param": "value"}
         )
@@ -320,7 +320,7 @@ class TestExecuteTool:
     async def test_execute_tool_internal_error(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should return generic error without leaking stack trace."""
+        """Should return generic error without leaking stack trace. / 应返回通用错误且不泄露堆栈信息。"""
 
         async def handler(query: str, top_k: int = 5) -> str:
             raise RuntimeError("Database connection failed")
@@ -336,22 +336,22 @@ class TestExecuteTool:
 
         assert result.isError is True
         assert "internal" in result.content[0].text.lower()
-        # Should NOT leak the actual error message
+        # Should NOT leak the actual error message / 不应泄露真实错误消息
         assert "database" not in result.content[0].text.lower()
 
 
 # ============================================================================
-# ProtocolHandler - Capabilities Tests
+# ProtocolHandler - Capabilities Tests / ProtocolHandler - Capabilities 测试
 # ============================================================================
 
 
 class TestGetCapabilities:
-    """Tests for capabilities reporting."""
+    """Tests for capabilities reporting. / capabilities 报告测试。"""
 
     def test_capabilities_with_no_tools(
         self, protocol_handler: ProtocolHandler
     ) -> None:
-        """Should return empty tools capability when no tools registered."""
+        """Should return empty tools capability when no tools registered. / 未注册工具时应返回空 tools capability。"""
         caps = protocol_handler.get_capabilities()
         assert "tools" in caps
         assert caps["tools"] == {}
@@ -359,7 +359,7 @@ class TestGetCapabilities:
     def test_capabilities_with_tools(
         self, protocol_handler: ProtocolHandler, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should indicate tools capability when tools registered."""
+        """Should indicate tools capability when tools registered. / 注册工具时应指示 tools capability。"""
 
         async def handler(**kwargs: Any) -> str:
             return "result"
@@ -376,15 +376,15 @@ class TestGetCapabilities:
 
 
 # ============================================================================
-# JSON-RPC Error Codes Tests
+# JSON-RPC Error Codes Tests / JSON-RPC 错误码测试
 # ============================================================================
 
 
 class TestJSONRPCErrorCodes:
-    """Tests for JSON-RPC error code constants."""
+    """Tests for JSON-RPC error code constants. / JSON-RPC 错误码常量测试。"""
 
     def test_error_codes_are_correct(self) -> None:
-        """Should have standard JSON-RPC 2.0 error codes."""
+        """Should have standard JSON-RPC 2.0 error codes. / 应具有标准 JSON-RPC 2.0 错误码。"""
         assert JSONRPCErrorCodes.PARSE_ERROR == -32700
         assert JSONRPCErrorCodes.INVALID_REQUEST == -32600
         assert JSONRPCErrorCodes.METHOD_NOT_FOUND == -32601
@@ -393,15 +393,15 @@ class TestJSONRPCErrorCodes:
 
 
 # ============================================================================
-# create_mcp_server Factory Tests
+# create_mcp_server Factory Tests / create_mcp_server 工厂测试
 # ============================================================================
 
 
 class TestCreateMCPServer:
-    """Tests for the server factory function."""
+    """Tests for the server factory function. / server 工厂函数测试。"""
 
     def test_creates_server_instance(self) -> None:
-        """Should create a Server instance."""
+        """Should create a Server instance. / 应创建 Server 实例。"""
         from mcp.server.lowlevel import Server
 
         server = create_mcp_server("test-server", "1.0.0")
@@ -409,7 +409,7 @@ class TestCreateMCPServer:
         assert isinstance(server, Server)
 
     def test_attaches_protocol_handler(self) -> None:
-        """Should attach protocol handler to server."""
+        """Should attach protocol handler to server. / 应将 protocol handler 附加到 server。"""
         server = create_mcp_server("test-server", "1.0.0")
 
         handler = get_protocol_handler(server)
@@ -421,7 +421,7 @@ class TestCreateMCPServer:
     def test_uses_provided_protocol_handler(
         self, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Should use provided protocol handler if given."""
+        """Should use provided protocol handler if given. / 如果提供了 protocol handler，应使用它。"""
         custom_handler = ProtocolHandler(
             server_name="custom",
             server_version="2.0.0",
@@ -447,18 +447,18 @@ class TestCreateMCPServer:
 
 
 # ============================================================================
-# Integration-like Tests (Server + ProtocolHandler)
+# Integration-like Tests (Server + ProtocolHandler) / 类集成测试（Server + ProtocolHandler）
 # ============================================================================
 
 
 class TestServerProtocolHandlerIntegration:
-    """Tests for server and protocol handler working together."""
+    """Tests for server and protocol handler working together. / server 和 protocol handler 协同工作的测试。"""
 
     @pytest.mark.asyncio
     async def test_list_tools_returns_registered_tools(
         self, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Server's list_tools handler should return registered tools."""
+        """Server's list_tools handler should return registered tools. / Server 的 list_tools handler 应返回已注册工具。"""
         handler = ProtocolHandler(
             server_name="test-server",
             server_version="1.0.0",
@@ -476,7 +476,7 @@ class TestServerProtocolHandlerIntegration:
 
         server = create_mcp_server("test-server", "1.0.0", protocol_handler=handler)
 
-        # Verify tools are accessible through protocol handler
+        # Verify tools are accessible through protocol handler / 验证可通过 protocol handler 访问工具
         tools = handler.get_tool_schemas()
         assert len(tools) == 1
         assert tools[0].name == "query_knowledge_hub"
@@ -485,7 +485,7 @@ class TestServerProtocolHandlerIntegration:
     async def test_call_tool_executes_handler(
         self, sample_tool_schema: Dict[str, Any]
     ) -> None:
-        """Server's call_tool handler should execute the tool."""
+        """Server's call_tool handler should execute the tool. / Server 的 call_tool handler 应执行工具。"""
         handler = ProtocolHandler(
             server_name="test-server",
             server_version="1.0.0",
@@ -503,7 +503,7 @@ class TestServerProtocolHandlerIntegration:
 
         server = create_mcp_server("test-server", "1.0.0", protocol_handler=handler)
 
-        # Execute through protocol handler
+        # Execute through protocol handler / 通过 protocol handler 执行
         result = await handler.execute_tool("search", {"query": "test", "top_k": 10})
 
         assert result.isError is False
